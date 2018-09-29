@@ -1,0 +1,40 @@
+<html>
+<head></head>
+<body>
+	<div id='header'><h1>Sitio de Ventas XYZ</h1></div>
+	<div id='features'>
+		<div id='search'>
+			<form action="/cgi-bin/results" method="post">
+				<div class="container">
+					<label for="product"><b>Enter product</b></label>
+					<input type="text" placeholder="Enter product" name="product" required>
+					<button type="submit">Search</button>
+				</div>
+			</form>
+		</div>
+		<div id='login'>
+			<h3>Users Login</h3>
+			<form action="/cgi-bin/login" method="post">
+				<div class="container">
+					<label for="username"><b>Username</b></label>
+					<input type="text" placeholder="Enter username" name="username" required>
+					<label for="password"><b>Password</b></label>
+					<input type="text" placeholder="Enter password" name="password" required>					
+					<button type="submit">Login</button>
+				</div>
+			</form>			
+		</div>
+		<div id='register'>
+			<h3><a href='/cgi-bin/register'>Users Register</a></h3>		
+		</div>
+	</div>
+	<div id='content'>
+		<div class='product'>
+			<p>Nombre: </p> XYZ
+			<p>Descripcion: </p> Description
+			<p>Precio: </p> Precio
+			<button type="">Add to cart</button>
+		</div>
+	</div>
+</body>
+</html>

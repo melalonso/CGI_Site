@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/MyCGI.dir/main.cpp.o  -o MyCGI -lmysqlcppconn 
