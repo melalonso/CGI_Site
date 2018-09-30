@@ -20,7 +20,7 @@ void DatabaseManager::insert_product(std::string name, std::string description, 
     std::cout << "Inserting product...\n";
 }
 
-void DatabaseManager::get_products() {
+void DatabaseManager::getProducts() {
     stmt = con->createStatement();
     res = stmt->executeQuery("SELECT * from products");
     while (res->next()) {

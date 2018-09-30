@@ -19,13 +19,15 @@ public:
     string phone;
     string password;
 
+    User() {}
+
     User(int user_id, string full_name, string user_name, string email, string phone, string password) {
-        user_id = user_id;
-        full_name = full_name;
-        user_name = user_name;
-        email = email;
-        phone = phone;
-        password = password;
+        this->user_id = user_id;
+        this->full_name = full_name;
+        this->user_name = user_name;
+        this->email = email;
+        this->phone = phone;
+        this->password = password;
     }
 };
 
@@ -44,6 +46,19 @@ public:
     }
 };
 
+class ShopCart {
+public:
+    string cookie_id;
+    string product_id;
+    int quantity;
+
+    ShopCart(string cookie_id, string product_id, int quantity) {
+        this->cookie_id = cookie_id;
+        this->product_id = product_id;
+        this->quantity = quantity;
+    }
+};
+
 
 class DatabaseManager {
 private:
@@ -51,6 +66,7 @@ private:
     sql::Connection *con;
     sql::Statement *stmt;
     sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
 public:
 
     DatabaseManager() {
@@ -60,11 +76,49 @@ public:
         con->setSchema("sitio_ventas");
     }
 
-    void insert_product(std::string name, std::string description, int price) {
-        std::cout << "Inserting product...\n";
+    //Definition for Destructor
+    ~DatabaseManager() {
+        delete res;
+        delete stmt;
+        delete con;
+        delete pstmt;
     }
 
-    vector<Product> get_products() {
+    void insertUser(User u) {
+        pstmt = connection->prepareStatement(
+                "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
+        pstmt->setString(1, u.name);
+        pstmt->setString(2, u.user);
+        pstmt->setString(3, u.email);
+        pstmt->setString(4, u.phone);
+        pstmt->setString(5, u.password);
+        pstmt->execute();
+    }
+
+    void updateUserCookie(string username, string cookieId) {
+        stmt = connection->createStatement();
+        stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
+    }
+
+    void insertProduct(Product p) {
+        pstmt = connection->prepareStatement(
+                "INSERT INTO products(name, description, price) VALUES (?,?,?)");
+        pstmt->setString(1, p.name);
+        pstmt->setString(2, p.description);
+        pstmt->setInt(3, p.price);
+        pstmt->execute();
+    }
+
+    void insertShopCart(ShopCart sc) {
+        pstmt = connection->prepareStatement(
+                "INSERT INTO shop_cart(cookie_id, product_id, quantity) VALUES (?,?,?)");
+        pstmt->setString(1, sc.cookie_id);
+        pstmt->setString(2, sc.product_id);
+        pstmt->setInt(3, sc.quantity);
+        pstmt->execute();
+    }
+
+    vector<Product> getProducts() {
         vector<Product> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from products");
@@ -79,12 +133,40 @@ public:
         return results;
     }
 
-//Definition for Destructor
-    ~DatabaseManager() {
-        delete res;
-        delete stmt;
-        delete con;
+    vector<Product> getProductsOnShoppingCart(string cookie_id) {
+        vector<Product> results;
+        stmt = con->createStatement();
+        res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
+                                 "where sc.cookie_id='" + cookie_id + "';");
+        while (res->next()) {
+            string name = res->getString(5);
+            string description = res->getString(6);
+            int price = res->getInt(7);
+            Product p(-1, name, description, price);
+            results.push_back(p);
+        }
+        return results;
     }
+
+    User getUser(string username) {
+        stmt = con->createStatement();
+        res = stmt->executeQuery("SELECT * from users where username=\"" + username + "\";");
+        if (res->next()) {
+            int user_id = res->getInt(1);
+            string full_name = res->getString(2);
+            string user_name = res->getString(3);
+            string email = res->getString(4);
+            string phone = res->getString(5);
+            string password = res->getString(6);
+            string cookie_id = res->getString(7);
+            User user(user_id, full_name, email, phone, password, cookie_id);
+        } else {
+            User user = nullptr;
+        }
+        return user;
+    }
+
+
 };
 
 
@@ -96,7 +178,7 @@ void print_products(vector<Product> products, bool isUserLogged) {
         cout << "\t\t\t<p>Descripcion: " << product.description << "</p>\n";
         cout << "\t\t\t<p>Precio: " << product.price << "</p>\n";
         if (isUserLogged) {
-            cout << "<a href=\"/cgi-bin/addcart?"<< product.product_id<< "\">Add to Cart</a><br><br>\n";
+            cout << "<a href=\"/cgi-bin/addcart?" << product.product_id << "\">Add to Cart</a><br><br>\n";
         }
         cout << "\t\t</div>\n";
     }

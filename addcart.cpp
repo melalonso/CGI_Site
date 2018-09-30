@@ -69,7 +69,7 @@ public:
         std::cout << "Inserting product...\n";
     }
 
-    vector<Product> get_products() {
+    vector<Product> getProducts() {
         vector<Product> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from products");
@@ -124,9 +124,29 @@ map<string, string> parse(const string &query) {
 }
 
 
+void printShopingCart(vector<Product> products) {
+    cout << "<table>\n";
+    cout << "\t<tr>\n";
+    cout << "\t<th>Codigo</th>\n";
+    cout << "\t<th>Nombre</th>\n";
+    cout << "\t<th>Descripcion</th>\n";
+    cout << "\t<th>Precio</th>\n";
+    cout << "\t</tr>\n";
+    for (auto product : products) {
+        cout << "<tr>\n";
+        cout << "<td>" << product.product_id << "</td>\n";
+        cout << "<td>" << product.name << "</td>\n";
+        cout << "<td>" << product.description << "</td>\n";
+        cout << "<td>" << product.price << "</td>\n";
+        cout << "</tr>\n";
+    }
+    cout << "</table>\n";
+}
+
+
 int main() {
 
-    if (const char *tmp = std::getenv("QUERY_STRING")) {
+    if (const char *tmp = std::getenv("QUERY_STRING")) { // Receive item number
         string queryString(tmp);
         map<string, string> parameters = parse(queryString);
 
@@ -182,7 +202,7 @@ int main() {
 
     cout << "\t<div id='content'>\n";
 
-    vector<Product> products = dbMgr.get_products();
+    vector<Product> products = dbMgr.getProducts();
     print_products(products, isUserLogged);
     cout << "\t</div>\n"
             "</body>\n"

@@ -46,7 +46,7 @@ public:
         std::cout << "Inserting product...\n";
     }
 
-    vector <Product> get_products() {
+    vector <Product> getProducts() {
         vector <Product> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from products");
@@ -72,7 +72,7 @@ public:
 int main() {
     DatabaseManager db;
 
-    vector<Product> v = db.get_products();
+    vector<Product> v = db.getProducts();
     for (auto i : v){
         cout << i.name << "\n";
     }

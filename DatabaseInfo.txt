@@ -13,13 +13,12 @@ update shopcart set qty=qty+1 where cookie=? and item_number=?
 insert into shopcart values(?,?,?)
 
 
+
+create table users (user_id int NOT NULL AUTO_INCREMENT, full_name varchar(100), user_name varchar(20), email VARCHAR(30), phone VARCHAR(15), password VARCHAR(30), cookie_id VARCHAR(50), PRIMARY KEY (user_id));
+
+create table products (product_id int NOT NULL AUTO_INCREMENT, name varchar(30), description varchar(300), price int, PRIMARY KEY (product_id));
+
+create table shop_cart (cookie_id VARCHAR(50), product_id int, quantity int, PRIMARY KEY (cookie_id, product_id));
+
+
 select * from shopcart, items where shopcart.cookie=? and items.stocknum=shopcart.item_number
-
-
-create table users user_id, full_name, user_name, email, phone, password;
-
-create table products product_id, name, description, price, user_id;
-
-create table user_cookies cookie_id, user_id;
-
-create table shop_cart cookie_id, product_id, quantity;

@@ -24,7 +24,7 @@ public:
 
     void insert_product(std::string, std::string, int);
 
-    void get_products();
+    void getProducts();
 
 
 };
