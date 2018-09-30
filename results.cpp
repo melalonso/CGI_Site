@@ -36,9 +36,6 @@ int main() {
 
     search_text = parameters["product"];
 
-
-
-
     sql::Driver *driver;
     sql::Connection *con;
     sql::Statement *stmt;

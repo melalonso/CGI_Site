@@ -6,12 +6,19 @@
 #include <cppconn/statement.h>
 #include <cppconn/exception.h>
 #include <regex>
+#include <cstdlib>
 
 using namespace std;
 
 int main() {
 
     cout << "Content-type:text/html\r\n\r\n";
+
+    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+        cout << "Your PATH is: " << env_p << '\n';
+        cout << "<h2> USUARIO LOGIEADO </h2>\n";
+    }
+
     cout << "<html>\n"
             "<head></head>\n"
             "<body>\n"
@@ -64,20 +71,20 @@ int main() {
         string description = res->getString(3);
         int price = res->getInt(4);
 
-        cout << "\t\t<div class='product'>\n"
-                "\t\t\t<p>Codigo: </p>"<< code <<"\n"
-                "\t\t\t<p>Nombre: </p>"<< name <<"\n"
-                "\t\t\t<p>Descripcion: </p> "<< description <<"\n"
-                "\t\t\t<p>Precio: </p>"<< price << "\n"
-                "\t\t\t<button type=\"\">Add to cart</button>\n"
-                "\t\t</div>\n";
+        cout << "\t\t<div class='product' style='float:left;'>\n"
+                "\t\t\t<p>Codigo: " << code << "</p>\n"
+                                               "\t\t\t<p>Nombre: " << name << "</p>\n"
+                                                                              "\t\t\t<p>Descripcion: " << description
+             << "</p>\n"
+                "\t\t\t<p>Precio: " << price << "</p>\n"
+                                                "\t\t\t<button type=\"\">Add to cart</button>\n"
+                                                "\t\t</div>\n";
     }
 
 
     cout << "\t</div>\n"
             "</body>\n"
             "</html>";
-
 
 
     delete res;
