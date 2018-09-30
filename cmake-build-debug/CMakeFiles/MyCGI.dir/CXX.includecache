@@ -9,4 +9,20 @@
 /home/melalonso/CLionProjects/CGI_Project/main.cpp
 iostream
 -
+iostream
+-
+mysql_connection.h
+/home/melalonso/CLionProjects/CGI_Project/mysql_connection.h
+cppconn/driver.h
+-
+cppconn/resultset.h
+-
+cppconn/statement.h
+-
+cppconn/exception.h
+-
+regex
+-
+cstdlib
+-
 

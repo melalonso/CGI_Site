@@ -70,8 +70,11 @@ int main() {
 
         if (password == stored_password) {
             string session_id = genRandomString(32);
-            cout << "Set-Cookie: sid=" << session_id << "; Max-Age=3600\n";
+            cout << "Set-Cookie: sid=" << session_id << "; Max-Age=3600; HttpOnly\n";
+            cout << "Set-Cookie: cartid=" << 123456789 << "; Max-Age=3600; HttpOnly\n";
+            cout << "Location: /cgi-bin/index\n";
             cout << "Content-type:text/html\r\n\r\n";
+            //cout << "<script> document.location =  /cgi-bin/index ; </script>";
             cout << "Password is correct!\n";
             cout << "Logging in user...\n";
         } else {

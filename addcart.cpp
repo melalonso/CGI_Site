@@ -1,3 +1,8 @@
+//
+// Created by melalonso on 9/30/18.
+//
+
+#include "addcart.h"
 #include <iostream>
 
 #include "mysql_connection.h"
@@ -96,14 +101,36 @@ void print_products(vector<Product> products, bool isUserLogged) {
         cout << "\t\t\t<p>Descripcion: " << product.description << "</p>\n";
         cout << "\t\t\t<p>Precio: " << product.price << "</p>\n";
         if (isUserLogged) {
-            cout << "<a href=\"/cgi-bin/addcart?"<< product.product_id<< "\">Add to Cart</a><br><br>\n";
+            cout << "<a href=\"/cgi-bin/addcart?" << product.product_id << "\">Add to Cart</a><br><br>\n";
         }
         cout << "\t\t</div>\n";
     }
 }
 
 
+map<string, string> parse(const string &query) {
+    map<string, string> data;
+    regex pattern("([\\w+%]+)=([^&]*)");
+    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
+    auto words_end = sregex_iterator();
+
+    for (sregex_iterator i = words_begin; i != words_end; i++) {
+        string key = (*i)[1].str();
+        string value = (*i)[2].str();
+        data[key] = value;
+    }
+
+    return data;
+}
+
+
 int main() {
+
+    if (const char *tmp = std::getenv("QUERY_STRING")) {
+        string queryString(tmp);
+        map<string, string> parameters = parse(queryString);
+
+    }
 
     DatabaseManager dbMgr;
 

@@ -123,6 +123,114 @@ MyCGI/fast:
 	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/build
 .PHONY : MyCGI/fast
 
+DatabaseManager.o: DatabaseManager.cpp.o
+
+.PHONY : DatabaseManager.o
+
+# target to build an object file
+DatabaseManager.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o
+.PHONY : DatabaseManager.cpp.o
+
+DatabaseManager.i: DatabaseManager.cpp.i
+
+.PHONY : DatabaseManager.i
+
+# target to preprocess a source file
+DatabaseManager.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.i
+.PHONY : DatabaseManager.cpp.i
+
+DatabaseManager.s: DatabaseManager.cpp.s
+
+.PHONY : DatabaseManager.s
+
+# target to generate assembly for a file
+DatabaseManager.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.s
+.PHONY : DatabaseManager.cpp.s
+
+add_product.o: add_product.cpp.o
+
+.PHONY : add_product.o
+
+# target to build an object file
+add_product.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product.cpp.o
+.PHONY : add_product.cpp.o
+
+add_product.i: add_product.cpp.i
+
+.PHONY : add_product.i
+
+# target to preprocess a source file
+add_product.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product.cpp.i
+.PHONY : add_product.cpp.i
+
+add_product.s: add_product.cpp.s
+
+.PHONY : add_product.s
+
+# target to generate assembly for a file
+add_product.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product.cpp.s
+.PHONY : add_product.cpp.s
+
+add_product_aux.o: add_product_aux.cpp.o
+
+.PHONY : add_product_aux.o
+
+# target to build an object file
+add_product_aux.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product_aux.cpp.o
+.PHONY : add_product_aux.cpp.o
+
+add_product_aux.i: add_product_aux.cpp.i
+
+.PHONY : add_product_aux.i
+
+# target to preprocess a source file
+add_product_aux.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product_aux.cpp.i
+.PHONY : add_product_aux.cpp.i
+
+add_product_aux.s: add_product_aux.cpp.s
+
+.PHONY : add_product_aux.s
+
+# target to generate assembly for a file
+add_product_aux.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/add_product_aux.cpp.s
+.PHONY : add_product_aux.cpp.s
+
+addcart.o: addcart.cpp.o
+
+.PHONY : addcart.o
+
+# target to build an object file
+addcart.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/addcart.cpp.o
+.PHONY : addcart.cpp.o
+
+addcart.i: addcart.cpp.i
+
+.PHONY : addcart.i
+
+# target to preprocess a source file
+addcart.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/addcart.cpp.i
+.PHONY : addcart.cpp.i
+
+addcart.s: addcart.cpp.s
+
+.PHONY : addcart.s
+
+# target to generate assembly for a file
+addcart.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/addcart.cpp.s
+.PHONY : addcart.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -159,6 +267,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... MyCGI"
+	@echo "... DatabaseManager.o"
+	@echo "... DatabaseManager.i"
+	@echo "... DatabaseManager.s"
+	@echo "... add_product.o"
+	@echo "... add_product.i"
+	@echo "... add_product.s"
+	@echo "... add_product_aux.o"
+	@echo "... add_product_aux.i"
+	@echo "... add_product_aux.s"
+	@echo "... addcart.o"
+	@echo "... addcart.i"
+	@echo "... addcart.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
