@@ -95,7 +95,7 @@ public:
         pstmt->execute();
     }
 
-    void updateUserCookie(string username, string cookieId) {
+    void updateUserCookie(string username, string cookieId) { // cookie of session
         stmt = connection->createStatement();
         stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
     }
@@ -166,6 +166,24 @@ public:
         return user;
     }
 
+    User getUserWithCookie(string cookie_id) {
+        stmt = con->createStatement();
+        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        if (res->next()) {
+            int user_id = res->getInt(1);
+            string full_name = res->getString(2);
+            string user_name = res->getString(3);
+            string email = res->getString(4);
+            string phone = res->getString(5);
+            string password = res->getString(6);
+            string cookie_id = res->getString(7);
+            User user(user_id, full_name, email, phone, password, cookie_id);
+        } else {
+            User user = nullptr;
+        }
+        return user;
+    }
+
 
 };
 
@@ -211,25 +229,29 @@ int main() {
             "\t\t\t\t\t<button type=\"submit\">Search</button>\n"
             "\t\t\t\t</div>\n"
             "\t\t\t</form>\n"
-            "\t\t</div>\n"
-            "\t\t<div id='login'>\n"
-            "\t\t\t<h3>Users Login</h3>\n"
-            "\t\t\t<form action=\"/cgi-bin/login\" method=\"post\">\n"
-            "\t\t\t\t<div class=\"container\">\n"
-            "\t\t\t\t\t<label for=\"username\"><b>Username</b></label>\n"
-            "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter username\" name=\"username\" required>\n"
-            "\t\t\t\t\t<label for=\"password\"><b>Password</b></label>\n"
-            "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter password\" name=\"password\" required>\t\t\t\t\t\n"
-            "\t\t\t\t\t<button type=\"submit\">Login</button>\n"
-            "\t\t\t\t</div>\n"
-            "\t\t\t</form>\t\t\t\n"
-            "\t\t</div>\n"
-            "\t\t<div id='register'>\n"
-            "\t\t\t<h3><a href='/cgi-bin/register'>Users Register</a></h3>\t\t\n"
-            "\t\t</div>\n"
-            "\t</div>\n";
+            "\t\t</div>\n";
 
-    if (isUserLogged) {
+    if (!isUserLogged) {
+        cout << "\t\t<div id='login'>\n"
+                "\t\t\t<h3>Users Login</h3>\n"
+                "\t\t\t<form action=\"/cgi-bin/login\" method=\"post\">\n"
+                "\t\t\t\t<div class=\"container\">\n"
+                "\t\t\t\t\t<label for=\"username\"><b>Username</b></label>\n"
+                "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter username\" name=\"username\" required>\n"
+                "\t\t\t\t\t<label for=\"password\"><b>Password</b></label>\n"
+                "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter password\" name=\"password\" required>\t\t\t\t\t\n"
+                "\t\t\t\t\t<button type=\"submit\">Login</button>\n"
+                "\t\t\t\t</div>\n"
+                "\t\t\t</form>\t\t\t\n"
+                "\t\t</div>\n"
+                "\t\t<div id='register'>\n"
+                "\t\t\t<h3><a href='/cgi-bin/register'>Users Register</a></h3>\t\t\n"
+                "\t\t</div>\n"
+                "\t</div>\n";
+    } else {
+        cout << "\t\t<div id='logout'>\n"
+                "\t\t\t<h3><a href='/cgi-bin/logout'>Logout</a></h3>\n"
+                "\t\t</div>";
         cout << "\t\t<div id='add_product'>\n"
                 "\t\t\t<h3><a href='/cgi-bin/add_product'>Sell product</a></h3>\n"
                 "\t\t</div>";

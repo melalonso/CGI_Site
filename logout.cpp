@@ -189,60 +189,28 @@ public:
 
 };
 
-map<string, string> parse(const string &query) {
-    map<string, string> data;
-    regex pattern("([\\w+%]+)=([^&]*)");
-    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
-    auto words_end = sregex_iterator();
-
-    for (sregex_iterator i = words_begin; i != words_end; i++) {
-        string key = (*i)[1].str();
-        string value = (*i)[2].str();
-        data[key] = value;
-    }
-
-    return data;
-}
-
-string alphanum = "0123456789!@#$%^&*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-int stringLength = sizeof(alphanum) - 1;
-
-string genRandomString(int size) {
-    string randStr = "";
-    while (size--) {
-        randStr += alphanum[rand() % stringLength];
-    }
-    return randStr;
-}
 
 int main() {
-    string login_data;
-    cin >> login_data;
-    map<string, string> parameters = parse(login_data);
-    string username = parameters["username"];
-    string password = parameters["password"];
-
-
     DatabaseManager dbMgr;
+    bool isUserLogged = false;
+    string ssid = "";
 
-    User u = dbMgr.getUser(username);
-
-    if (u != nullptr) {
-        string stored_password = u.password;
-        if (password == stored_password) {
-            string session_id = genRandomString(32);
-            cout << "Set-Cookie: sid=" << session_id << "; Max-Age=3600; HttpOnly\n";
-            cout << "Location: /cgi-bin/index\n";
-            cout << "Content-type:text/html\r\n\r\n";
-            cout << "Password is correct!\n";
-            cout << "Logging in user...\n";
-        } else {
-            cout << "Content-type:text/html\r\n\r\n";
-            cout << "Password is incorrect\n";
-        }
-        cout << "<a href='/cgi-bin/index'>Volver</a>";
+    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+        cout << "Your sid is: " << env_p << '\n';
+        ssid = string(env_p);
+        isUserLogged = true;
     }
 
+    if (isUserLogged) {
+        User u = dbMgr.getUserWithCookie(ssid);
+        dbMgr.updateUserCookie(u.username, '');
+        cout << "Set-Cookie: sid=''; Expires=-1d; HttpOnly\n";
+        cout << "Location: /cgi-bin/index\n";
+        cout << "Content-type:text/html\r\n\r\n";
+    } else {
+        cout << "Content-type:text/html\r\n\r\n";
+        cout << "Could not log out\n";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
+    }
     return 0;
 }
