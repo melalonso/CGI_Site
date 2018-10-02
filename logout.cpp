@@ -8,6 +8,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/exception.h>
+#include <cppconn/prepared_statement.h>
 
 using namespace std;
 
@@ -87,10 +88,10 @@ public:
     }
 
     void insertUser(User u) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
-        pstmt->setString(1, u.name);
-        pstmt->setString(2, u.user);
+        pstmt->setString(1, u.full_name);
+        pstmt->setString(2, u.user_name);
         pstmt->setString(3, u.email);
         pstmt->setString(4, u.phone);
         pstmt->setString(5, u.password);
@@ -98,12 +99,12 @@ public:
     }
 
     void updateUserCookie(string username, string cookieId) { // cookie of session
-        stmt = connection->createStatement();
+        stmt = con->createStatement();
         stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
     }
 
     void insertProduct(Product p) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO products(name, description, price) VALUES (?,?,?)");
         pstmt->setString(1, p.name);
         pstmt->setString(2, p.description);
@@ -112,7 +113,7 @@ public:
     }
 
     void insertShopCart(ShopCart sc) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO shop_cart(cookie_id, product_id, quantity) VALUES (?,?,?)");
         pstmt->setString(1, sc.cookie_id);
         pstmt->setString(2, sc.product_id);
@@ -150,7 +151,8 @@ public:
         return results;
     }
 
-    User getUser(string username) {
+    User *getUser(string username) {
+        User *user = nullptr;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from users where username=\"" + username + "\";");
         if (res->next()) {
@@ -161,14 +163,13 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, email, phone, password, cookie_id);
         }
         return user;
     }
 
-    User getUserWithCookie(string cookie_id) {
+    User *getUserWithCookie(string cookie_id) {
+        User *user = nullptr;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
         if (res->next()) {
@@ -179,9 +180,7 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, email, phone, password, cookie_id);
         }
         return user;
     }
@@ -190,23 +189,28 @@ public:
 };
 
 
+
+
+
 int main() {
-    DatabaseManager dbMgr;
+    DatabaseManager *dbMgr = new DatabaseManager();
     bool isUserLogged = false;
     string ssid = "";
 
     if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        cout << "Your sid is: " << env_p << '\n';
         ssid = string(env_p);
         isUserLogged = true;
     }
 
     if (isUserLogged) {
-        User u = dbMgr.getUserWithCookie(ssid);
-        dbMgr.updateUserCookie(u.username, '');
-        cout << "Set-Cookie: sid=''; Expires=-1d; HttpOnly\n";
-        cout << "Location: /cgi-bin/index\n";
-        cout << "Content-type:text/html\r\n\r\n";
+        //User *u = dbMgr->getUserWithCookie(ssid);
+        //if (u != nullptr) {
+            //dbMgr->updateUserCookie(u->user_name, "");
+            //delete u;
+            cout << "Set-Cookie: sid=''; Expires=0; HttpOnly;\n";
+            cout << "Location: /cgi-bin/index\n";
+            cout << "Content-type:text/html\r\n\r\n";
+        //}
     } else {
         cout << "Content-type:text/html\r\n\r\n";
         cout << "Could not log out\n";

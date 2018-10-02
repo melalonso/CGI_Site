@@ -8,6 +8,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/exception.h>
+#include <cppconn/prepared_statement.h>
 
 using namespace std;
 
@@ -20,16 +21,19 @@ public:
     string email;
     string phone;
     string password;
+    string cookie_id;
 
     User() {}
 
-    User(int user_id, string full_name, string user_name, string email, string phone, string password) {
+    User(int user_id, string full_name, string user_name, string email, string phone, string password,
+         string cookie_id) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
         this->email = email;
         this->phone = phone;
         this->password = password;
+        this->cookie_id = cookie_id;
     }
 };
 
@@ -61,7 +65,6 @@ public:
     }
 };
 
-
 class DatabaseManager {
 private:
     sql::Driver *driver;
@@ -87,10 +90,10 @@ public:
     }
 
     void insertUser(User u) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
-        pstmt->setString(1, u.name);
-        pstmt->setString(2, u.user);
+        pstmt->setString(1, u.full_name);
+        pstmt->setString(2, u.user_name);
         pstmt->setString(3, u.email);
         pstmt->setString(4, u.phone);
         pstmt->setString(5, u.password);
@@ -98,12 +101,12 @@ public:
     }
 
     void updateUserCookie(string username, string cookieId) { // cookie of session
-        stmt = connection->createStatement();
+        stmt = con->createStatement();
         stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
     }
 
     void insertProduct(Product p) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO products(name, description, price) VALUES (?,?,?)");
         pstmt->setString(1, p.name);
         pstmt->setString(2, p.description);
@@ -112,7 +115,7 @@ public:
     }
 
     void insertShopCart(ShopCart sc) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO shop_cart(cookie_id, product_id, quantity) VALUES (?,?,?)");
         pstmt->setString(1, sc.cookie_id);
         pstmt->setString(2, sc.product_id);
@@ -150,9 +153,10 @@ public:
         return results;
     }
 
-    User getUser(string username) {
+    User *getUser(string username) {
+        User *user = nullptr;
         stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where username=\"" + username + "\";");
+        res = stmt->executeQuery("SELECT * from users where user_name=\"" + username + "\";");
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -161,14 +165,13 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
 
-    User getUserWithCookie(string cookie_id) {
+    User *getUserWithCookie(string cookie_id) {
+        User *user = nullptr;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
         if (res->next()) {
@@ -179,9 +182,7 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
@@ -224,25 +225,35 @@ int main() {
     string password = parameters["password"];
 
 
-    DatabaseManager dbMgr;
+    DatabaseManager *dbMgr = new DatabaseManager();
 
-    User u = dbMgr.getUser(username);
+    User *u = dbMgr->getUser(username);
 
     if (u != nullptr) {
-        string stored_password = u.password;
+        string stored_password = u->password;
         if (password == stored_password) {
             string session_id = genRandomString(32);
             cout << "Set-Cookie: sid=" << session_id << "; Max-Age=3600; HttpOnly\n";
+            dbMgr->updateUserCookie(username, session_id);
             cout << "Location: /cgi-bin/index\n";
             cout << "Content-type:text/html\r\n\r\n";
             cout << "Password is correct!\n";
             cout << "Logging in user...\n";
         } else {
             cout << "Content-type:text/html\r\n\r\n";
+            cout << password << " vs " << stored_password << "\n";
+            cout << (password == stored_password) << "<br>\n";
+            cout << u->user_name << " - " << u->email << "<br>\n\n";
+            cout << (password.compare(stored_password) == 0) << "<br>\n";
+            cout << (stored_password==stored_password) << " ---- \n";
+            cout << typeid(password).name() << "<br>";
+            cout << typeid(stored_password).name() << "<br>";
             cout << "Password is incorrect\n";
         }
         cout << "<a href='/cgi-bin/index'>Volver</a>";
     }
 
+    delete u;
+    delete dbMgr;
     return 0;
 }

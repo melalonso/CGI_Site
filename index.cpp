@@ -11,6 +11,8 @@
 
 using namespace std;
 
+
+
 class User {
 public:
     int user_id;
@@ -19,16 +21,19 @@ public:
     string email;
     string phone;
     string password;
+    string cookie_id;
 
     User() {}
 
-    User(int user_id, string full_name, string user_name, string email, string phone, string password) {
+    User(int user_id, string full_name, string user_name, string email, string phone, string password,
+         string cookie_id) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
         this->email = email;
         this->phone = phone;
         this->password = password;
+        this->cookie_id = cookie_id;
     }
 };
 
@@ -59,7 +64,6 @@ public:
         this->quantity = quantity;
     }
 };
-
 
 class DatabaseManager {
 private:
@@ -152,7 +156,7 @@ public:
     User *getUser(string username) {
         User *user = nullptr;
         stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where username=\"" + username + "\";");
+        res = stmt->executeQuery("SELECT * from users where user_name=\"" + username + "\";");
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -161,7 +165,7 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, email, phone, password, cookie_id);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
@@ -178,14 +182,13 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, email, phone, password, cookie_id);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
 
 
 };
-
 
 void print_products(vector<Product> products, bool isUserLogged) {
     for (auto product : products) {
@@ -202,15 +205,38 @@ void print_products(vector<Product> products, bool isUserLogged) {
 }
 
 
+map<string, string> parse(const string &query) {
+    map<string, string> data;
+    regex pattern("([\\w+%]+)=([^&]*)");
+    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
+    auto words_end = sregex_iterator();
+
+    for (sregex_iterator i = words_begin; i != words_end; i++) {
+        string key = (*i)[1].str();
+        string value = (*i)[2].str();
+        data[key] = value;
+    }
+    return data;
+}
+
+
 int main() {
     cout << "Content-type:text/html\r\n\r\n";
     DatabaseManager *dbMgr = new DatabaseManager();
     bool isUserLogged = false;
+    string ssid = "";
 
     if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        cout << "Your sid is: " << env_p << '\n';
-        cout << "<h2> USUARIO LOGIEADO </h2>\n";
-        isUserLogged = true;
+        ssid = string(env_p);
+        map<string, string> parameters = parse(ssid);
+        if (!parameters.empty() && parameters["sid"] != "") {
+            User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+            if (u != nullptr) {
+                string username = u->user_name;
+                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                isUserLogged = true;
+            }
+        }
     }
 
     cout << "<html>\n"
