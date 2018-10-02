@@ -1,5 +1,4 @@
 
-#include "add_product_aux.h"
 #include <iostream>
 #include <bits/stdc++.h>
 #include "mysql_connection.h"

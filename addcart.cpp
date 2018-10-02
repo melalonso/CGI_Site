@@ -1,8 +1,3 @@
-//
-// Created by melalonso on 9/30/18.
-//
-
-#include "addcart.h"
 #include <iostream>
 
 #include "mysql_connection.h"
