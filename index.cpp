@@ -7,6 +7,7 @@
 #include <cppconn/exception.h>
 #include <regex>
 #include <cstdlib>
+#include <cppconn/prepared_statement.h>
 
 using namespace std;
 
@@ -85,10 +86,10 @@ public:
     }
 
     void insertUser(User u) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
-        pstmt->setString(1, u.name);
-        pstmt->setString(2, u.user);
+        pstmt->setString(1, u.full_name);
+        pstmt->setString(2, u.user_name);
         pstmt->setString(3, u.email);
         pstmt->setString(4, u.phone);
         pstmt->setString(5, u.password);
@@ -96,12 +97,12 @@ public:
     }
 
     void updateUserCookie(string username, string cookieId) { // cookie of session
-        stmt = connection->createStatement();
+        stmt = con->createStatement();
         stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
     }
 
     void insertProduct(Product p) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO products(name, description, price) VALUES (?,?,?)");
         pstmt->setString(1, p.name);
         pstmt->setString(2, p.description);
@@ -110,7 +111,7 @@ public:
     }
 
     void insertShopCart(ShopCart sc) {
-        pstmt = connection->prepareStatement(
+        pstmt = con->prepareStatement(
                 "INSERT INTO shop_cart(cookie_id, product_id, quantity) VALUES (?,?,?)");
         pstmt->setString(1, sc.cookie_id);
         pstmt->setString(2, sc.product_id);
@@ -148,7 +149,8 @@ public:
         return results;
     }
 
-    User getUser(string username) {
+    User *getUser(string username) {
+        User *user = nullptr;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from users where username=\"" + username + "\";");
         if (res->next()) {
@@ -159,14 +161,13 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, email, phone, password, cookie_id);
         }
         return user;
     }
 
-    User getUserWithCookie(string cookie_id) {
+    User *getUserWithCookie(string cookie_id) {
+        User *user = nullptr;
         stmt = con->createStatement();
         res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
         if (res->next()) {
@@ -177,9 +178,7 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            User user(user_id, full_name, email, phone, password, cookie_id);
-        } else {
-            User user = nullptr;
+            user = new User(user_id, full_name, email, phone, password, cookie_id);
         }
         return user;
     }
@@ -204,10 +203,8 @@ void print_products(vector<Product> products, bool isUserLogged) {
 
 
 int main() {
-
-    DatabaseManager dbMgr;
-
     cout << "Content-type:text/html\r\n\r\n";
+    DatabaseManager *dbMgr = new DatabaseManager();
     bool isUserLogged = false;
 
     if (const char *env_p = std::getenv("HTTP_COOKIE")) {
@@ -259,11 +256,12 @@ int main() {
 
     cout << "\t<div id='content'>\n";
 
-    vector<Product> products = dbMgr.get_products();
+    vector<Product> products = dbMgr->getProducts();
     print_products(products, isUserLogged);
     cout << "\t</div>\n"
             "</body>\n"
             "</html>";
+    delete dbMgr;
 
     return 0;
 }
