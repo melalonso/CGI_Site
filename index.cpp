@@ -12,7 +12,6 @@
 using namespace std;
 
 
-
 class User {
 public:
     int user_id;
@@ -198,7 +197,7 @@ void print_products(vector<Product> products, bool isUserLogged) {
         cout << "\t\t\t<p>Descripcion: " << product.description << "</p>\n";
         cout << "\t\t\t<p>Precio: " << product.price << "</p>\n";
         if (isUserLogged) {
-            cout << "<a href=\"/cgi-bin/addcart?" << product.product_id << "\">Add to Cart</a><br><br>\n";
+            cout << "<a href=\"/cgi-bin/addcart?pid=" << product.product_id << "\">Add to Cart</a><br><br>\n";
         }
         cout << "\t\t</div>\n";
     }
@@ -206,9 +205,10 @@ void print_products(vector<Product> products, bool isUserLogged) {
 
 
 map<string, string> parse(const string &query) {
+    string query2 = query.substr(0, query.size());
     map<string, string> data;
     regex pattern("([\\w+%]+)=([^&]*)");
-    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
+    auto words_begin = sregex_iterator(query2.begin(), query2.end(), pattern);
     auto words_end = sregex_iterator();
 
     for (sregex_iterator i = words_begin; i != words_end; i++) {

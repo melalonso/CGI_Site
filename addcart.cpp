@@ -7,8 +7,10 @@
 #include <cppconn/exception.h>
 #include <regex>
 #include <cstdlib>
+#include <cppconn/prepared_statement.h>
 
 using namespace std;
+
 
 class User {
 public:
@@ -18,14 +20,19 @@ public:
     string email;
     string phone;
     string password;
+    string cookie_id;
 
-    User(int user_id, string full_name, string user_name, string email, string phone, string password) {
-        user_id = user_id;
-        full_name = full_name;
-        user_name = user_name;
-        email = email;
-        phone = phone;
-        password = password;
+    User() {}
+
+    User(int user_id, string full_name, string user_name, string email, string phone, string password,
+         string cookie_id) {
+        this->user_id = user_id;
+        this->full_name = full_name;
+        this->user_name = user_name;
+        this->email = email;
+        this->phone = phone;
+        this->password = password;
+        this->cookie_id = cookie_id;
     }
 };
 
@@ -44,6 +51,18 @@ public:
     }
 };
 
+class ShopCart {
+public:
+    string cookie_id;
+    string product_id;
+    int quantity;
+
+    ShopCart(string cookie_id, string product_id, int quantity) {
+        this->cookie_id = cookie_id;
+        this->product_id = product_id;
+        this->quantity = quantity;
+    }
+};
 
 class DatabaseManager {
 private:
@@ -51,6 +70,7 @@ private:
     sql::Connection *con;
     sql::Statement *stmt;
     sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
 public:
 
     DatabaseManager() {
@@ -60,8 +80,46 @@ public:
         con->setSchema("sitio_ventas");
     }
 
-    void insert_product(std::string name, std::string description, int price) {
-        std::cout << "Inserting product...\n";
+    //Definition for Destructor
+    ~DatabaseManager() {
+        delete res;
+        delete stmt;
+        delete con;
+        delete pstmt;
+    }
+
+    void insertUser(User u) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
+        pstmt->setString(1, u.full_name);
+        pstmt->setString(2, u.user_name);
+        pstmt->setString(3, u.email);
+        pstmt->setString(4, u.phone);
+        pstmt->setString(5, u.password);
+        pstmt->execute();
+    }
+
+    void updateUserCookie(string username, string cookieId) { // cookie of session
+        stmt = con->createStatement();
+        stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
+    }
+
+    void insertProduct(Product p) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO products(name, description, price) VALUES (?,?,?)");
+        pstmt->setString(1, p.name);
+        pstmt->setString(2, p.description);
+        pstmt->setInt(3, p.price);
+        pstmt->execute();
+    }
+
+    void insertShopCart(ShopCart sc) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO shop_cart(cookie_id, product_id, quantity) VALUES (?,?,?)");
+        pstmt->setString(1, sc.cookie_id);
+        pstmt->setString(2, sc.product_id);
+        pstmt->setInt(3, sc.quantity);
+        pstmt->execute();
     }
 
     vector<Product> getProducts() {
@@ -79,28 +137,90 @@ public:
         return results;
     }
 
-//Definition for Destructor
-    ~DatabaseManager() {
-        delete res;
-        delete stmt;
-        delete con;
-    }
-};
-
-
-void print_products(vector<Product> products, bool isUserLogged) {
-    for (auto product : products) {
-        cout << "\t\t<div class='product' style='float:left;'>\n";
-        cout << "\t\t\t<p>Codigo: " << product.product_id << "</p>\n";
-        cout << "\t\t\t<p>Nombre: " << product.name << "</p>\n";
-        cout << "\t\t\t<p>Descripcion: " << product.description << "</p>\n";
-        cout << "\t\t\t<p>Precio: " << product.price << "</p>\n";
-        if (isUserLogged) {
-            cout << "<a href=\"/cgi-bin/addcart?" << product.product_id << "\">Add to Cart</a><br><br>\n";
+    vector<Product> getProductsOnShoppingCart(int user_id) {
+        vector<Product> results;
+        stmt = con->createStatement();
+        res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
+                                 "where sc.user_id=" + to_string(user_id) + ";");
+        while (res->next()) {
+            string name = res->getString(6);
+            string description = res->getString(7);
+            int price = res->getInt(8);
+            Product p(-1, name, description, price);
+            results.push_back(p);
         }
-        cout << "\t\t</div>\n";
+        return results;
     }
-}
+
+    User *getUser(string username) {
+        User *user = nullptr;
+        stmt = con->createStatement();
+        res = stmt->executeQuery("SELECT * from users where user_name=\"" + username + "\";");
+        if (res->next()) {
+            int user_id = res->getInt(1);
+            string full_name = res->getString(2);
+            string user_name = res->getString(3);
+            string email = res->getString(4);
+            string phone = res->getString(5);
+            string password = res->getString(6);
+            string cookie_id = res->getString(7);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+        }
+        return user;
+    }
+
+    User *getUserWithCookie(string cookie_id) {
+        User *user = nullptr;
+        stmt = con->createStatement();
+        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        if (res->next()) {
+            int user_id = res->getInt(1);
+            string full_name = res->getString(2);
+            string user_name = res->getString(3);
+            string email = res->getString(4);
+            string phone = res->getString(5);
+            string password = res->getString(6);
+            string cookie_id = res->getString(7);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+        }
+        return user;
+    }
+
+
+    bool isProductAlreadyOnCart(int userId, int productId) {
+        string query = "select * from shop_cart where checkout=0 and "
+                       "user_id=" + to_string(userId) + " and product_id=" + to_string(productId) + ";";
+        res = stmt->executeQuery(query);
+        return res->next() ? true : false;
+    }
+
+    void increaseQuantityCartProduct(int userId, int productId) {
+        stmt = con->createStatement();
+        stmt->executeUpdate("UPDATE shop_cart SET quantity = quantity + 1 "
+                            "where checkout=0 and user_id=" + to_string(userId) + " and product_id=" +
+                            to_string(productId));
+    }
+
+    void setQuantityCartProduct(int userId, int productId, int quantity) {
+        stmt = con->createStatement();
+        stmt->executeUpdate("UPDATE shop_cart SET quantity =" + to_string(quantity) + " " +
+                            "where checkout=0 and user_id=" +
+                            to_string(userId) + " and product_id=" +
+                            to_string(productId));
+    }
+
+    void insertCartProduct(int userId, int productId) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO shop_cart(user_id, product_id, quantity, checkout) VALUES (?,?,?,?)");
+        pstmt->setInt(1, userId);
+        pstmt->setInt(2, productId);
+        pstmt->setInt(3, 1);
+        pstmt->setInt(4, 0);
+        pstmt->execute();
+    }
+
+
+};
 
 
 map<string, string> parse(const string &query) {
@@ -120,88 +240,74 @@ map<string, string> parse(const string &query) {
 
 
 void printShopingCart(vector<Product> products) {
+    cout << "<center>\n";
+    cout << "<h3>Your Shopping Cart</h3>\n";
+    cout << "<form action=\"/cgi-bin/checkout\" method=\"POST\">\n";
     cout << "<table>\n";
     cout << "\t<tr>\n";
-    cout << "\t<th>Codigo</th>\n";
-    cout << "\t<th>Nombre</th>\n";
-    cout << "\t<th>Descripcion</th>\n";
-    cout << "\t<th>Precio</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Nombre</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Descripcion</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Precio</th>\n";
     cout << "\t</tr>\n";
     for (auto product : products) {
         cout << "<tr>\n";
-        cout << "<td>" << product.product_id << "</td>\n";
-        cout << "<td>" << product.name << "</td>\n";
-        cout << "<td>" << product.description << "</td>\n";
-        cout << "<td>" << product.price << "</td>\n";
+        cout << "<td align=\"CENTER\">" << product.name << "</td>\n";
+        cout << "<td align=\"CENTER\">" << product.description << "</td>\n";
+        cout << "<td align=\"CENTER\">" << product.price << "</td>\n";
         cout << "</tr>\n";
     }
     cout << "</table>\n";
+    cout << "<input name=\"cartact\" type=\"submit\" value=\"Check Out\">\n"
+            "</form>\n"
+            "</center>\n";
 }
 
 
 int main() {
-
-    if (const char *tmp = std::getenv("QUERY_STRING")) { // Receive item number
-        string queryString(tmp);
-        map<string, string> parameters = parse(queryString);
-
-    }
-
-    DatabaseManager dbMgr;
-
     cout << "Content-type:text/html\r\n\r\n";
+
+    DatabaseManager *dbMgr = new DatabaseManager();
+    string sid = "";
+    int userId = -1;
+    int productId = -1;
     bool isUserLogged = false;
 
     if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        cout << "Your sid is: " << env_p << '\n';
-        cout << "<h2> USUARIO LOGIEADO </h2>\n";
-        isUserLogged = true;
+        sid = string(env_p);
+        map<string, string> parameters = parse(sid);
+        if (!parameters.empty() && parameters["sid"] != "") {
+            User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+            if (u != nullptr) {
+                userId = u->user_id;
+                string username = u->user_name;
+                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                isUserLogged = true;
+
+                if (const char *tmp = std::getenv("QUERY_STRING")) { // Receive item number
+                    string queryString(tmp);
+                    map<string, string> productRequested = parse(queryString);
+                    if (!productRequested.empty() && productRequested["pid"] != "") {
+                        productId = stoi(productRequested["pid"]);
+
+                        if (dbMgr->isProductAlreadyOnCart(userId, productId)) {
+                            dbMgr->increaseQuantityCartProduct(userId, productId, 1);
+                        } else {
+                            dbMgr->insertCartProduct(userId, productId);
+                        }
+
+
+                    }
+                }
+
+                vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                printShopingCart(shoppingCartProducts);
+
+            }
+        }
     }
-
-    cout << "<html>\n"
-            "<head></head>\n"
-            "<body>\n"
-            "\t<div id='header'><h1>Sitio de Ventas XYZ</h1></div>\n"
-            "\t<div id='features'>\n"
-            "\t\t<div id='search'>\n"
-            "\t\t\t<form action=\"/cgi-bin/results\" method=\"post\">\n"
-            "\t\t\t\t<div class=\"container\">\n"
-            "\t\t\t\t\t<label for=\"product\"><b>Enter product</b></label>\n"
-            "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter product\" name=\"product\" required>\n"
-            "\t\t\t\t\t<button type=\"submit\">Search</button>\n"
-            "\t\t\t\t</div>\n"
-            "\t\t\t</form>\n"
-            "\t\t</div>\n"
-            "\t\t<div id='login'>\n"
-            "\t\t\t<h3>Users Login</h3>\n"
-            "\t\t\t<form action=\"/cgi-bin/login\" method=\"post\">\n"
-            "\t\t\t\t<div class=\"container\">\n"
-            "\t\t\t\t\t<label for=\"username\"><b>Username</b></label>\n"
-            "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter username\" name=\"username\" required>\n"
-            "\t\t\t\t\t<label for=\"password\"><b>Password</b></label>\n"
-            "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter password\" name=\"password\" required>\t\t\t\t\t\n"
-            "\t\t\t\t\t<button type=\"submit\">Login</button>\n"
-            "\t\t\t\t</div>\n"
-            "\t\t\t</form>\t\t\t\n"
-            "\t\t</div>\n"
-            "\t\t<div id='register'>\n"
-            "\t\t\t<h3><a href='/cgi-bin/register'>Users Register</a></h3>\t\t\n"
-            "\t\t</div>\n"
-            "\t</div>\n";
-
-    if (isUserLogged) {
-        cout << "\t\t<div id='add_product'>\n"
-                "\t\t\t<h3><a href='/cgi-bin/add_product'>Sell product</a></h3>\n"
-                "\t\t</div>";
-    }
-
-    cout << "\t<div id='content'>\n";
-
-    vector<Product> products = dbMgr.getProducts();
-    print_products(products, isUserLogged);
-    cout << "\t</div>\n"
-            "</body>\n"
-            "</html>";
+    cout << "<hr><hr><hr>\n";
+    vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(1);
+    printShopingCart(shoppingCartProducts);
 
     return 0;
 }

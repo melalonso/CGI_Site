@@ -10,9 +10,10 @@
 using namespace std;
 
 map<string, string> parse(const string &query) {
+    string query2 = query.substr(0, query.size());
     map<string, string> data;
     regex pattern("([\\w+%]+)=([^&]*)");
-    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
+    auto words_begin = sregex_iterator(query2.begin(), query2.end(), pattern);
     auto words_end = sregex_iterator();
 
     for (sregex_iterator i = words_begin; i != words_end; i++) {
@@ -24,13 +25,10 @@ map<string, string> parse(const string &query) {
 }
 
 int main() {
-
-    string s = "";
-    string line;
-    while (cin >> line) {
-        s = s + line + "\n";
-    }
-    map<string, string> parameters = parse(s);
+    cout << "Content-type:text/html\r\n\r\n";
+    string input;
+    cin >> input;
+    map<string, string> parameters = parse(input);
 
     string name = parameters["name"];
     string user = parameters["user"];
@@ -62,7 +60,7 @@ int main() {
     pstmt->execute();
     delete pstmt;
 
-    cout << "Content-type:text/html\r\n\r\n";
+
     cout << "<b>Lei</b>\n";
     for (auto &kv : parameters) {
         cout << kv.first << " = " << kv.second << "\n";

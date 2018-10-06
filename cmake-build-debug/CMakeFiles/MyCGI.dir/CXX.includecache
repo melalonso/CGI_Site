@@ -6,9 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/melalonso/CLionProjects/CGI_Project/main.cpp
-iostream
--
+/home/melalonso/CLionProjects/CGI_Project/addcart.cpp
 iostream
 -
 mysql_connection.h
@@ -24,5 +22,7 @@ cppconn/exception.h
 regex
 -
 cstdlib
+-
+cppconn/prepared_statement.h
 -
 

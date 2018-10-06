@@ -191,9 +191,10 @@ public:
 };
 
 map<string, string> parse(const string &query) {
+    string query2 = query.substr(0, query.size());
     map<string, string> data;
     regex pattern("([\\w+%]+)=([^&]*)");
-    auto words_begin = sregex_iterator(query.begin(), query.end(), pattern);
+    auto words_begin = sregex_iterator(query2.begin(), query2.end(), pattern);
     auto words_end = sregex_iterator();
 
     for (sregex_iterator i = words_begin; i != words_end; i++) {
@@ -201,20 +202,23 @@ map<string, string> parse(const string &query) {
         string value = (*i)[2].str();
         data[key] = value;
     }
-
     return data;
 }
 
-string alphanum = "0123456789!@#$%^&*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+string alphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*abcdefghijklmnopqrstuvwxyz";
 
-int stringLength = sizeof(alphanum) - 1;
+int stringLength = alphanumeric.length();
 
 string genRandomString(int size) {
-    string randStr = "";
+    string randomString = "";
+    long seed1 = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine generator(seed1);
+    uniform_int_distribution<int> distribution(0, stringLength-1);
     while (size--) {
-        randStr += alphanum[rand() % stringLength];
+        int randomCharIdx = distribution(generator);
+        randomString += alphanumeric[randomCharIdx];
     }
-    return randStr;
+    return randomString;
 }
 
 int main() {
@@ -232,9 +236,9 @@ int main() {
     if (u != nullptr) {
         string stored_password = u->password;
         if (password == stored_password) {
-            string session_id = genRandomString(32);
-            cout << "Set-Cookie: sid=" << session_id << "; Max-Age=3600; HttpOnly\n";
-            dbMgr->updateUserCookie(username, session_id);
+            string mySid = genRandomString(32);
+            cout << "Set-Cookie: sid=" << mySid << "; Max-Age=3600; HttpOnly\n";
+            dbMgr->updateUserCookie(username, mySid);
             cout << "Location: /cgi-bin/index\n";
             cout << "Content-type:text/html\r\n\r\n";
             cout << "Password is correct!\n";
@@ -245,7 +249,7 @@ int main() {
             cout << (password == stored_password) << "<br>\n";
             cout << u->user_name << " - " << u->email << "<br>\n\n";
             cout << (password.compare(stored_password) == 0) << "<br>\n";
-            cout << (stored_password==stored_password) << " ---- \n";
+            cout << (stored_password == stored_password) << " ---- \n";
             cout << typeid(password).name() << "<br>";
             cout << typeid(stored_password).name() << "<br>";
             cout << "Password is incorrect\n";

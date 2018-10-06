@@ -7,7 +7,8 @@ CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o: ../DatabaseManager.h
 CMakeFiles/MyCGI.dir/add_product.cpp.o: ../add_product.cpp
 
 CMakeFiles/MyCGI.dir/add_product_aux.cpp.o: ../add_product_aux.cpp
-CMakeFiles/MyCGI.dir/add_product_aux.cpp.o: ../add_product_aux.h
+
+CMakeFiles/MyCGI.dir/addcart.cpp.o: ../addcart.cpp
 
 CMakeFiles/MyCGI.dir/main.cpp.o: ../main.cpp
 

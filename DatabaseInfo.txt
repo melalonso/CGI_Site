@@ -18,7 +18,13 @@ create table users (user_id int NOT NULL AUTO_INCREMENT, full_name varchar(100),
 
 create table products (product_id int NOT NULL AUTO_INCREMENT, name varchar(30), description varchar(300), price int, PRIMARY KEY (product_id));
 
-create table shop_cart (cookie_id VARCHAR(50), product_id int, quantity int, PRIMARY KEY (cookie_id, product_id));
+create table shop_cart (user_id VARCHAR(50), product_id int, quantity int, checkout tinyint(1), PRIMARY KEY (user_id, product_id, checkout));
 
 
 select * from shopcart, items where shopcart.cookie=? and items.stocknum=shopcart.item_number
+
+
+
+
+===== INSERTS =======
+insert into shop_cart (user_id, product_id, quantity, checkout) values (1, 6, 1, 0);
