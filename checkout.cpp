@@ -246,30 +246,29 @@ map<string, string> parse(const string &query) {
 }
 
 
-void printShopingCart(vector<Product> products) {
+void printOrderSummary(vector<Product> products) {
     int total = 0;
     cout << "<center>\n";
-    cout << "<h3>Your Shopping Cart</h3>\n";
-    cout << "<form action=\"/cgi-bin/checkout\" method=\"POST\">\n";
-    cout << "<table>\n";
-    cout << "\t<tr>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Nombre</th>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Descripcion</th>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Precio</th>\n";
-    cout << "\t</tr>\n";
+    cout << "<h4>Here's what you have ordered</h4>\n";
+    cout << "<ol>\n";
     for (auto product : products) {
-        cout << "<tr>\n";
-        cout << "<td align=\"CENTER\">" << product.name << "</td>\n";
-        cout << "<td align=\"CENTER\">" << product.description << "</td>\n";
-        cout << "<td align=\"CENTER\">" << product.price << "</td>\n";
+        cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
         total += product.price;
-        cout << "</tr>\n";
     }
-    cout << "</table>\n";
+    cout << "</ol>\n";
     cout << "<b>Total a pagar: " << total << "<br>\n";
-    cout << "<input name=\"cartact\" type=\"submit\" value=\"Check Out\">\n"
-            "</form>\n"
-            "</center>\n";
+}
+
+
+void printOrderForm() {
+    cout << "<h4>Finish your order</h4>\n";
+    cout << "<form action=\"/cgi-bin/finish_checkout\" method=\"post\">" << endl;
+    cout << "Shipping address: <input type=\"text\" name=\"shipping_address\" required><br>" << endl;
+    cout << "City: <input type=\"text\" name=\"city\" required><br>" << endl;
+    cout << "State: <input type=\"text\" name=\"state\" required><br>" << endl;
+    cout << "Country: <input type=\"text\" name=\"country\" required><br>" << endl;
+    cout << "<input type=\"submit\" value=\"Register\">" << endl;
+    cout << "</form>" << endl;
 }
 
 
@@ -293,23 +292,9 @@ int main() {
                 cout << "<h2> Bienvenido " << username << " </h2>\n";
                 isUserLogged = true;
 
-                if (const char *tmp = std::getenv("QUERY_STRING")) { // Receive item number
-                    string queryString(tmp);
-                    map<string, string> productRequested = parse(queryString);
-                    if (!productRequested.empty() && productRequested["pid"] != "") {
-                        productId = stoi(productRequested["pid"]);
-
-                        if (dbMgr->isProductAlreadyOnCart(userId, productId)) {
-                            dbMgr->increaseQuantityCartProduct(userId, productId);
-                        } else {
-                            dbMgr->insertCartProduct(userId, productId);
-                        }
-
-                    }
-                }
-
                 vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                printShopingCart(shoppingCartProducts);
+                printOrderSummary(shoppingCartProducts);
+                printOrderForm();
 
             }
         }
