@@ -249,7 +249,7 @@ public:
     }
 
 
-    long insertOrder(Order o) {
+    void insertOrder(Order o) {
         pstmt = con->prepareStatement(
                 "INSERT INTO orders(user_id, shipping_address, city, state, country) VALUES (?,?,?,?,?)");
         pstmt->setInt(1, o.userId);
@@ -257,12 +257,7 @@ public:
         pstmt->setString(3, o.city);
         pstmt->setString(4, o.state);
         pstmt->setString(5, o.country);
-        pstmt->execute();
-        stmt = con->createStatement();
-        sql::ResultSet *res = stmt->executeQuery("SELECT @@identity AS id;");
-        res->next();
-        return res->getInt64("id");
-
+        pstmt->execute(); // OCUPO EL ORDER ID
     }
 
     void insertOrderProduct(int orderId, int productId) {
@@ -297,29 +292,26 @@ map<string, string> parse(const string &query) {
 }
 
 
-void printOrderSummary(vector<Product> products) {
+void printOrderSummary(vector<Product> products, Order order) {
     int total = 0;
+    int subTotal = 0;
     cout << "<center>\n";
-    cout << "<h4>Here's what you have ordered</h4>\n";
+    cout << "<h2>Thank you!</h2>\n";
+    cout << "<p>Shipping address: " << order.shippingAddress << "</p>";
+    cout << "<p>City: " << order.city << "</p>";
+    cout << "<p>State: " << order.state << "</p>";
+    cout << "<p>Country: " << order.country << "</p>";
+
+    cout << "<h5>Products: </h5>\n";
     cout << "<ol>\n";
     for (auto product : products) {
         cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
-        total += product.price;
+        subTotal += product.price;
     }
     cout << "</ol>\n";
-    cout << "<b>Total a pagar: " << total << "<br>\n";
-}
-
-
-void printOrderForm() {
-    cout << "<h4>Finish your order</h4>\n";
-    cout << "<form action=\"/cgi-bin/finish_checkout\" method=\"post\">" << endl;
-    cout << "Shipping address: <input type=\"text\" name=\"shipping_address\" required><br>" << endl;
-    cout << "City: <input type=\"text\" name=\"city\" required><br>" << endl;
-    cout << "State: <input type=\"text\" name=\"state\" required><br>" << endl;
-    cout << "Country: <input type=\"text\" name=\"country\" required><br>" << endl;
-    cout << "<input type=\"submit\" value=\"Register\">" << endl;
-    cout << "</form>" << endl;
+    total = subTotal + (subTotal * 0.10)
+    cout << "<b>Subtotal: " << subTotal << "<br>\n";
+    cout << "<b>Total a pagar (subtotal + shipping): " << total << "<br>\n";
 }
 
 
@@ -344,9 +336,9 @@ int main() {
                 isUserLogged = true;
 
                 vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                printOrderSummary(shoppingCartProducts);
-                printOrderForm();
 
+                Order order = new Order(); // THIS IS THE REAL ORDER
+                printOrderSummary(shoppingCartProducts, order);
             }
         }
     }

@@ -137,15 +137,15 @@ public:
         return results;
     }
 
-    vector<Product> getProductsOnShoppingCart(string cookie_id) {
+    vector<Product> getProductsOnShoppingCart(int user_id) {
         vector<Product> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
-                                 "where sc.cookie_id='" + cookie_id + "';");
+                                 "where sc.user_id=" + to_string(user_id) + ";");
         while (res->next()) {
-            string name = res->getString(5);
-            string description = res->getString(6);
-            int price = res->getInt(7);
+            string name = res->getString(6);
+            string description = res->getString(7);
+            int price = res->getInt(8);
             Product p(-1, name, description, price);
             results.push_back(p);
         }
@@ -184,6 +184,66 @@ public:
             user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
+    }
+
+
+    bool isProductAlreadyOnCart(int userId, int productId) {
+        string query = "select * from shop_cart where checkout=0 and "
+                       "user_id=" + to_string(userId) + " and product_id=" + to_string(productId) + ";";
+        res = stmt->executeQuery(query);
+        return res->next() ? true : false;
+    }
+
+    void increaseQuantityCartProduct(int userId, int productId) {
+        stmt = con->createStatement();
+        stmt->executeUpdate("UPDATE shop_cart SET quantity = quantity + 1 "
+                            "where checkout=0 and user_id=" + to_string(userId) + " and product_id=" +
+                            to_string(productId));
+    }
+
+    void setQuantityCartProduct(int userId, int productId, int quantity) {
+        stmt = con->createStatement();
+        stmt->executeUpdate("UPDATE shop_cart SET quantity =" + to_string(quantity) + " " +
+                            "where checkout=0 and user_id=" +
+                            to_string(userId) + " and product_id=" +
+                            to_string(productId));
+    }
+
+    void insertCartProduct(int userId, int productId) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO shop_cart(user_id, product_id, quantity, checkout) VALUES (?,?,?,?)");
+        pstmt->setInt(1, userId);
+        pstmt->setInt(2, productId);
+        pstmt->setInt(3, 1);
+        pstmt->setInt(4, 0);
+        pstmt->execute();
+    }
+
+
+    void deleteProductFromCart(int userId, int productId) {
+        stmt = con->createStatement();
+        stmt->executeUpdate("delete from shop_cart where checkout=0 and "
+                            "user_id=" + to_string(userId) + " and product_id=" + to_string(productId));
+    }
+
+
+    void insertOrder(Order o) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO orders(user_id, shipping_address, city, state, country) VALUES (?,?,?,?,?)");
+        pstmt->setInt(1, o.userId);
+        pstmt->setString(2, o.shippingAddress);
+        pstmt->setString(3, o.city);
+        pstmt->setString(4, o.state);
+        pstmt->setString(5, o.country);
+        pstmt->execute(); // OCUPO EL ORDER ID
+    }
+
+    void insertOrderProduct(int orderId, int productId) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO order_products(order_id, user_id) VALUES (?,?)");
+        pstmt->setInt(1, orderId);
+        pstmt->setInt(2, productId);
+        pstmt->execute();
     }
 
 
