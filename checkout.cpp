@@ -36,6 +36,28 @@ public:
     }
 };
 
+
+class Order {
+public:
+    int orderId;
+    int userId;
+    string shippingAddress;
+    string city;
+    string state;
+    string country;
+
+    Order() {}
+
+    Order(int orderId, int userId, string shippingAddress, string city, string state, string country) {
+        this->orderId = orderId;
+        this->userId = userId;
+        this->shippingAddress = shippingAddress;
+        this->city = city;
+        this->state = state;
+        this->country = country;
+    }
+};
+
 class Product {
 public:
     int product_id;
@@ -224,6 +246,26 @@ public:
         stmt = con->createStatement();
         stmt->executeUpdate("delete from shop_cart where checkout=0 and "
                             "user_id=" + to_string(userId) + " and product_id=" + to_string(productId));
+    }
+
+
+    void insertOrder(Order o) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO orders(user_id, shipping_address, city, state, country) VALUES (?,?,?,?,?)");
+        pstmt->setInt(1, o.userId);
+        pstmt->setString(2, o.shippingAddress);
+        pstmt->setString(3, o.city);
+        pstmt->setString(4, o.state);
+        pstmt->setString(5, o.country);
+        pstmt->execute(); // OCUPO EL ORDER ID
+    }
+
+    void insertOrderProduct(int orderId, int productId) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO order_products(order_id, user_id) VALUES (?,?)");
+        pstmt->setInt(1, orderId);
+        pstmt->setInt(2, productId);
+        pstmt->execute();
     }
 
 
