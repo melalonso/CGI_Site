@@ -335,10 +335,29 @@ int main() {
                 cout << "<h2> Bienvenido " << username << " </h2>\n";
                 isUserLogged = true;
 
+
                 vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
 
-                Order order = new Order(); // THIS IS THE REAL ORDER
+                string input;
+                cin >> input;
+                map<string, string> form_parameters;
+                form_parameters = parse(input);
+
+                string shippingAddress = form_parameters["shipping_address"];
+                string city = form_parameters["city"];
+                string state = form_parameters["state"];
+                string country = form_parameters["country"];
+                Order order(-1, userId, shippingAddress, city, state, country);
+
+                long orderId = dbMgr->insertOrder(order);
+                for (Product p : shoppingCartProducts) {
+                    int productId = p.product_id;
+                    dbMgr->insertOrderProduct(orderId, productId);
+                }
+                dbMgr->cleanShopCart(userId);
+
                 printOrderSummary(shoppingCartProducts, order);
+
             }
         }
     }

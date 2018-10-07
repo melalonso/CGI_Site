@@ -12,11 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb2a6a7c-0b9c-4300-90f6-6fbfcc0f664b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/finish_checkout.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DatabaseInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/DatabaseInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkout.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/checkout.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/index.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/finish_checkout.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/finish_checkout.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,7 +42,7 @@
         <counts>
           <entry key="Makefile" value="3" />
           <entry key="Notas" value="2" />
-          <entry key="cpp" value="109" />
+          <entry key="cpp" value="110" />
           <entry key="h" value="11" />
           <entry key="html" value="4" />
           <entry key="txt" value="1" />
@@ -56,14 +52,14 @@
         <counts>
           <entry key="CMakeLists.txt" value="1" />
           <entry key="HTML" value="4" />
-          <entry key="ObjectiveC" value="120" />
+          <entry key="ObjectiveC" value="121" />
           <entry key="PLAIN_TEXT" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Makefile" value="3" />
-          <entry key="cpp" value="7124" />
+          <entry key="cpp" value="7561" />
           <entry key="h" value="101" />
           <entry key="html" value="73" />
         </counts>
@@ -71,7 +67,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="73" />
-          <entry key="ObjectiveC" value="7225" />
+          <entry key="ObjectiveC" value="7662" />
           <entry key="PLAIN_TEXT" value="3" />
         </counts>
       </usages-collector>
@@ -79,14 +75,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/checkout.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="268">
-              <caret line="265" column="5" selection-start-line="265" selection-start-column="5" selection-end-line="265" selection-end-column="5" />
+            <state relative-caret-position="148">
+              <caret line="316" column="75" selection-start-line="316" selection-start-column="59" selection-end-line="316" selection-end-column="75" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/finish_checkout.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="388">
+              <caret line="357" lean-forward="true" selection-start-line="357" selection-end-line="357" />
             </state>
           </provider>
         </entry>
@@ -120,8 +125,8 @@
         <option value="$PROJECT_DIR$/login.cpp" />
         <option value="$PROJECT_DIR$/addcart.cpp" />
         <option value="$PROJECT_DIR$/index.cpp" />
-        <option value="$PROJECT_DIR$/finish_checkout.cpp" />
         <option value="$PROJECT_DIR$/checkout.cpp" />
+        <option value="$PROJECT_DIR$/finish_checkout.cpp" />
       </list>
     </option>
   </component>
@@ -221,12 +226,12 @@
       <workItem from="1538342854830" duration="4302000" />
       <workItem from="1538508899672" duration="11902000" />
       <workItem from="1538828700268" duration="16241000" />
-      <workItem from="1538906424986" duration="5047000" />
+      <workItem from="1538906424986" duration="6710000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65775000" />
+    <option name="totallyTimeSpent" value="67438000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="31" width="1368" height="692" extended-state="6" />
@@ -440,13 +445,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/finish_checkout.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4965">
-          <caret line="340" column="63" selection-start-line="340" selection-start-column="63" selection-end-line="340" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/cppconn/prepared_statement.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="211">
@@ -456,11 +454,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/checkout.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="268">
-          <caret line="265" column="5" selection-start-line="265" selection-start-column="5" selection-end-line="265" selection-end-column="5" />
+        <state relative-caret-position="148">
+          <caret line="316" column="75" selection-start-line="316" selection-start-column="59" selection-end-line="316" selection-end-column="75" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/finish_checkout.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="388">
+          <caret line="357" lean-forward="true" selection-start-line="357" selection-end-line="357" />
         </state>
       </provider>
     </entry>
