@@ -84,12 +84,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/DatabaseManager.cpp">
-			<Option target="MyCGI"/>
-		</Unit>
-		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/DatabaseManager.h">
-			<Option target="MyCGI"/>
-		</Unit>
 		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/add_product.cpp">
 			<Option target="MyCGI"/>
 		</Unit>
@@ -99,7 +93,10 @@
 		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/addcart.cpp">
 			<Option target="MyCGI"/>
 		</Unit>
-		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/main.cpp">
+		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/send_message.cpp">
+			<Option target="MyCGI"/>
+		</Unit>
+		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/send_message_aux.cpp">
 			<Option target="MyCGI"/>
 		</Unit>
 		<Unit filename="/home/melalonso/CLionProjects/CGI_Project/CMakeLists.txt">

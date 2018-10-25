@@ -20,6 +20,8 @@ create table products (product_id int NOT NULL AUTO_INCREMENT, name varchar(30),
 
 create table shop_cart (user_id VARCHAR(50), product_id int, quantity int, checkout tinyint(1), PRIMARY KEY (user_id, product_id, checkout));
 
+create table messages (message_id int NOT NULL AUTO_INCREMENT, person_name varchar(50), message TEXT, PRIMARY KEY (message_id));
+
 
 select * from shopcart, items where shopcart.cookie=? and items.stocknum=shopcart.item_number
 

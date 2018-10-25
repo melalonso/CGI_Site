@@ -3,5 +3,5 @@ project(MyCGI)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(MyCGI main.cpp add_product.cpp DatabaseManager.cpp DatabaseManager.h add_product_aux.cpp addcart.cpp)
+add_executable(MyCGI add_product.cpp add_product_aux.cpp addcart.cpp send_message.cpp send_message_aux.cpp)
 target_link_libraries(MyCGI mysqlcppconn)

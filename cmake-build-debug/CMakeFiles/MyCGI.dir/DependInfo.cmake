@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/melalonso/CLionProjects/CGI_Project/DatabaseManager.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o"
   "/home/melalonso/CLionProjects/CGI_Project/add_product.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/add_product.cpp.o"
   "/home/melalonso/CLionProjects/CGI_Project/add_product_aux.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/add_product_aux.cpp.o"
   "/home/melalonso/CLionProjects/CGI_Project/addcart.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/addcart.cpp.o"
-  "/home/melalonso/CLionProjects/CGI_Project/main.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/main.cpp.o"
+  "/home/melalonso/CLionProjects/CGI_Project/send_message.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/send_message.cpp.o"
+  "/home/melalonso/CLionProjects/CGI_Project/send_message_aux.cpp" "/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles/MyCGI.dir/send_message_aux.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

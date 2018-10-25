@@ -92,7 +92,7 @@ int main() {
     delete pstmt;
 
 
-    cout << "Usuario registrado de forma exitosa\n";
+    cout << "User registered sucessfully\n";
     cout << "<a href='/cgi-bin/index'>Volver</a>";
 
     // Eliminamos los objetos

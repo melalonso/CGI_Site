@@ -165,10 +165,11 @@ public:
         res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
                                  "where sc.user_id=" + to_string(user_id) + ";");
         while (res->next()) {
+            int id = res->getInt(5);
             string name = res->getString(6);
             string description = res->getString(7);
             int price = res->getInt(8);
-            Product p(-1, name, description, price);
+            Product p(id, name, description, price);
             results.push_back(p);
         }
         return results;
@@ -300,15 +301,14 @@ map<string, string> parse(const string &query) {
 void printOrderSummary(vector<Product> products, Order order) {
     int total = 0;
     int subTotal = 0;
-    cout << "<center>\n";
     cout << "<h2>Thank you!</h2>\n";
     cout << "<p>Shipping address: " << order.shippingAddress << "</p>";
     cout << "<p>City: " << order.city << "</p>";
     cout << "<p>State: " << order.state << "</p>";
     cout << "<p>Country: " << order.country << "</p>";
 
-    cout << "<h5>Products: </h5>\n";
-    cout << "<ol>\n";
+    cout << "<h4>Products: </h4>\n";
+    cout << "<ul>\n";
     for (auto product : products) {
         cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
         subTotal += product.price;
@@ -317,6 +317,7 @@ void printOrderSummary(vector<Product> products, Order order) {
     total = subTotal + (subTotal * 0.10);
     cout << "<b>Subtotal: " << subTotal << "<br>\n";
     cout << "<b>Total a pagar (subtotal + shipping): " << total << "<br>\n";
+    cout << "<a href='http://localhost/cgi-bin/index'>Back</a>";
 }
 
 
@@ -337,12 +338,11 @@ int main() {
             if (u != nullptr) {
                 userId = u->user_id;
                 string username = u->user_name;
-                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                cout << "<h2> Welcome " << username << " </h2>\n";
                 isUserLogged = true;
 
 
                 vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                cout << "Tengo " << shoppingCartProducts.size() << " products...<br>";
 
                 string input;
                 cin >> input;
@@ -353,20 +353,14 @@ int main() {
                 string city = form_parameters["city"];
                 string state = form_parameters["state"];
                 string country = form_parameters["country"];
-                cout << "Tengo " << city << " y " << state << "<br>";
                 Order order(-1, userId, shippingAddress, city, state, country);
 
                 long orderId = dbMgr->insertOrder(order);
-                cout << "Order id tras insertar es " << orderId << "<br>";
                 for (Product p : shoppingCartProducts) {
-                    cout << "Iterando productos<br>";
-                    cout << "Name: " << p.name << "<br>";
                     int productId = p.product_id;
                     dbMgr->insertOrderProduct(orderId, productId);
                 }
-                cout << "Cleaning shopping cart....<br>";
                 dbMgr->cleanShopCart(userId);
-
                 printOrderSummary(shoppingCartProducts, order);
 
             }

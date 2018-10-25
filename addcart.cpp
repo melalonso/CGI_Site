@@ -253,9 +253,9 @@ void printShopingCart(vector<Product> products) {
     cout << "<form action=\"/cgi-bin/checkout\" method=\"POST\">\n";
     cout << "<table>\n";
     cout << "\t<tr>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Nombre</th>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Descripcion</th>\n";
-    cout << "\t<th bgcolor=\"#cccccc\">Precio</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Name</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Description</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Price</th>\n";
     cout << "\t</tr>\n";
     for (auto product : products) {
         cout << "<tr>\n";
@@ -266,9 +266,10 @@ void printShopingCart(vector<Product> products) {
         cout << "</tr>\n";
     }
     cout << "</table>\n";
-    cout << "<b>Total a pagar: " << total << "<br>\n";
+    cout << "<b>Total to pay: " << total << "<br>\n";
     cout << "<input name=\"cartact\" type=\"submit\" value=\"Check Out\">\n"
             "</form>\n"
+            "<a href='http://localhost/cgi-bin/index'>See more products</a>"
             "</center>\n";
 }
 
@@ -290,7 +291,7 @@ int main() {
             if (u != nullptr) {
                 userId = u->user_id;
                 string username = u->user_name;
-                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                cout << "<h2> Welcome " << username << " </h2>\n";
                 isUserLogged = true;
 
                 if (const char *tmp = std::getenv("QUERY_STRING")) { // Receive item number

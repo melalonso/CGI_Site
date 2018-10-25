@@ -57,22 +57,9 @@ include CMakeFiles/MyCGI.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/MyCGI.dir/flags.make
 
-CMakeFiles/MyCGI.dir/main.cpp.o: CMakeFiles/MyCGI.dir/flags.make
-CMakeFiles/MyCGI.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MyCGI.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/main.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/main.cpp
-
-CMakeFiles/MyCGI.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyCGI.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/melalonso/CLionProjects/CGI_Project/main.cpp > CMakeFiles/MyCGI.dir/main.cpp.i
-
-CMakeFiles/MyCGI.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/main.cpp -o CMakeFiles/MyCGI.dir/main.cpp.s
-
 CMakeFiles/MyCGI.dir/add_product.cpp.o: CMakeFiles/MyCGI.dir/flags.make
 CMakeFiles/MyCGI.dir/add_product.cpp.o: ../add_product.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/MyCGI.dir/add_product.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MyCGI.dir/add_product.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/add_product.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/add_product.cpp
 
 CMakeFiles/MyCGI.dir/add_product.cpp.i: cmake_force
@@ -83,22 +70,9 @@ CMakeFiles/MyCGI.dir/add_product.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/add_product.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/add_product.cpp -o CMakeFiles/MyCGI.dir/add_product.cpp.s
 
-CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o: CMakeFiles/MyCGI.dir/flags.make
-CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o: ../DatabaseManager.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/DatabaseManager.cpp
-
-CMakeFiles/MyCGI.dir/DatabaseManager.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyCGI.dir/DatabaseManager.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/melalonso/CLionProjects/CGI_Project/DatabaseManager.cpp > CMakeFiles/MyCGI.dir/DatabaseManager.cpp.i
-
-CMakeFiles/MyCGI.dir/DatabaseManager.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/DatabaseManager.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/DatabaseManager.cpp -o CMakeFiles/MyCGI.dir/DatabaseManager.cpp.s
-
 CMakeFiles/MyCGI.dir/add_product_aux.cpp.o: CMakeFiles/MyCGI.dir/flags.make
 CMakeFiles/MyCGI.dir/add_product_aux.cpp.o: ../add_product_aux.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/MyCGI.dir/add_product_aux.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/MyCGI.dir/add_product_aux.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/add_product_aux.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/add_product_aux.cpp
 
 CMakeFiles/MyCGI.dir/add_product_aux.cpp.i: cmake_force
@@ -111,7 +85,7 @@ CMakeFiles/MyCGI.dir/add_product_aux.cpp.s: cmake_force
 
 CMakeFiles/MyCGI.dir/addcart.cpp.o: CMakeFiles/MyCGI.dir/flags.make
 CMakeFiles/MyCGI.dir/addcart.cpp.o: ../addcart.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/MyCGI.dir/addcart.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/MyCGI.dir/addcart.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/addcart.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/addcart.cpp
 
 CMakeFiles/MyCGI.dir/addcart.cpp.i: cmake_force
@@ -122,22 +96,48 @@ CMakeFiles/MyCGI.dir/addcart.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/addcart.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/addcart.cpp -o CMakeFiles/MyCGI.dir/addcart.cpp.s
 
+CMakeFiles/MyCGI.dir/send_message.cpp.o: CMakeFiles/MyCGI.dir/flags.make
+CMakeFiles/MyCGI.dir/send_message.cpp.o: ../send_message.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/MyCGI.dir/send_message.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/send_message.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/send_message.cpp
+
+CMakeFiles/MyCGI.dir/send_message.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyCGI.dir/send_message.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/melalonso/CLionProjects/CGI_Project/send_message.cpp > CMakeFiles/MyCGI.dir/send_message.cpp.i
+
+CMakeFiles/MyCGI.dir/send_message.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/send_message.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/send_message.cpp -o CMakeFiles/MyCGI.dir/send_message.cpp.s
+
+CMakeFiles/MyCGI.dir/send_message_aux.cpp.o: CMakeFiles/MyCGI.dir/flags.make
+CMakeFiles/MyCGI.dir/send_message_aux.cpp.o: ../send_message_aux.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/MyCGI.dir/send_message_aux.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyCGI.dir/send_message_aux.cpp.o -c /home/melalonso/CLionProjects/CGI_Project/send_message_aux.cpp
+
+CMakeFiles/MyCGI.dir/send_message_aux.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyCGI.dir/send_message_aux.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/melalonso/CLionProjects/CGI_Project/send_message_aux.cpp > CMakeFiles/MyCGI.dir/send_message_aux.cpp.i
+
+CMakeFiles/MyCGI.dir/send_message_aux.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyCGI.dir/send_message_aux.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/melalonso/CLionProjects/CGI_Project/send_message_aux.cpp -o CMakeFiles/MyCGI.dir/send_message_aux.cpp.s
+
 # Object files for target MyCGI
 MyCGI_OBJECTS = \
-"CMakeFiles/MyCGI.dir/main.cpp.o" \
 "CMakeFiles/MyCGI.dir/add_product.cpp.o" \
-"CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o" \
 "CMakeFiles/MyCGI.dir/add_product_aux.cpp.o" \
-"CMakeFiles/MyCGI.dir/addcart.cpp.o"
+"CMakeFiles/MyCGI.dir/addcart.cpp.o" \
+"CMakeFiles/MyCGI.dir/send_message.cpp.o" \
+"CMakeFiles/MyCGI.dir/send_message_aux.cpp.o"
 
 # External object files for target MyCGI
 MyCGI_EXTERNAL_OBJECTS =
 
-MyCGI: CMakeFiles/MyCGI.dir/main.cpp.o
 MyCGI: CMakeFiles/MyCGI.dir/add_product.cpp.o
-MyCGI: CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o
 MyCGI: CMakeFiles/MyCGI.dir/add_product_aux.cpp.o
 MyCGI: CMakeFiles/MyCGI.dir/addcart.cpp.o
+MyCGI: CMakeFiles/MyCGI.dir/send_message.cpp.o
+MyCGI: CMakeFiles/MyCGI.dir/send_message_aux.cpp.o
 MyCGI: CMakeFiles/MyCGI.dir/build.make
 MyCGI: CMakeFiles/MyCGI.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/melalonso/CLionProjects/CGI_Project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable MyCGI"

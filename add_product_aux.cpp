@@ -24,6 +24,36 @@ map<string, string> parse(const string &query) {
     return data;
 }
 
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
 int main() {
 
     string s = "";
@@ -33,9 +63,9 @@ int main() {
     }
     map<string, string> parameters = parse(s);
 
-    string name = parameters["name"];
-    string description = parameters["description"];
-    string price = parameters["price"];
+    string name = decode(parameters["name"]);
+    string description = decode(parameters["description"]);
+    string price = decode(parameters["price"]);
 
 
     sql::Driver *driver;
@@ -60,11 +90,7 @@ int main() {
     delete pstmt;
 
     cout << "Content-type:text/html\r\n\r\n";
-    cout << "<b>Lei</b>\n";
-    for (auto &kv : parameters) {
-        cout << kv.first << " = " << kv.second << "\n";
-    }
-    cout << "Inserted\n";
+    cout << "Product was inserted<br>";
     cout << "<a href='/cgi-bin/index'>Volver</a>";
 
     // Eliminamos los objetos

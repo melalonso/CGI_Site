@@ -318,7 +318,7 @@ void printOrderForm() {
     cout << "City: <input type=\"text\" name=\"city\" required><br>" << endl;
     cout << "State: <input type=\"text\" name=\"state\" required><br>" << endl;
     cout << "Country: <input type=\"text\" name=\"country\" required><br>" << endl;
-    cout << "<input type=\"submit\" value=\"Register\">" << endl;
+    cout << "<input type=\"submit\" value=\"Place order\">" << endl;
     cout << "</form>" << endl;
 }
 

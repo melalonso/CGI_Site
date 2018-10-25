@@ -153,10 +153,29 @@ public:
         return results;
     }
 
+//    User *getUser(string username) {
+//        User *user = nullptr;
+//        stmt = con->createStatement();
+//        res = stmt->executeQuery("SELECT * from users where user_name=\"" + username + "\";");
+//        if (res->next()) {
+//            int user_id = res->getInt(1);
+//            string full_name = res->getString(2);
+//            string user_name = res->getString(3);
+//            string email = res->getString(4);
+//            string phone = res->getString(5);
+//            string password = res->getString(6);
+//            string cookie_id = res->getString(7);
+//            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+//        }
+//        return user;
+//    }
+
+
     User *getUser(string username) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where user_name=\"" + username + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where user_name=?");
+        pstmt->setString(1, username);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -169,6 +188,7 @@ public:
         }
         return user;
     }
+
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
@@ -213,7 +233,7 @@ string genRandomString(int size) {
     string randomString = "";
     long seed1 = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator(seed1);
-    uniform_int_distribution<int> distribution(0, stringLength-1);
+    uniform_int_distribution<int> distribution(0, stringLength - 1);
     while (size--) {
         int randomCharIdx = distribution(generator);
         randomString += alphanumeric[randomCharIdx];
@@ -239,25 +259,24 @@ int main() {
             string mySid = genRandomString(32);
             cout << "Set-Cookie: sid=" << mySid << "; Max-Age=3600; HttpOnly\n";
             dbMgr->updateUserCookie(username, mySid);
-            cout << "Location: /cgi-bin/index\n";
+            //cout << "Location: /cgi-bin/index\n";
+            cout << "Refresh: 1; url=http://localhost/cgi-bin/index/\n";
             cout << "Content-type:text/html\r\n\r\n";
-            cout << "Password is correct!\n";
-            cout << "Logging in user...\n";
+            cout << "Logging in user....<br>";
         } else {
             cout << "Content-type:text/html\r\n\r\n";
-            cout << password << " vs " << stored_password << "\n";
-            cout << (password == stored_password) << "<br>\n";
-            cout << u->user_name << " - " << u->email << "<br>\n\n";
-            cout << (password.compare(stored_password) == 0) << "<br>\n";
-            cout << (stored_password == stored_password) << " ---- \n";
-            cout << typeid(password).name() << "<br>";
-            cout << typeid(stored_password).name() << "<br>";
-            cout << "Password is incorrect\n";
+            cout << "Password is incorrect<br>\n";
+            cout << "<a href='/cgi-bin/index'>Back</a>";
         }
-        cout << "<a href='/cgi-bin/index'>Volver</a>";
+    } else {
+        cout << "Content-type:text/html\r\n\r\n";
+        cout << "User does not exist<br>\n";
+        cout << "<a href='/cgi-bin/index'>Back</a>";
     }
 
+
+    //delete dbMgr;
     delete u;
-    delete dbMgr;
+
     return 0;
 }

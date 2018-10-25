@@ -123,33 +123,6 @@ MyCGI/fast:
 	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/build
 .PHONY : MyCGI/fast
 
-DatabaseManager.o: DatabaseManager.cpp.o
-
-.PHONY : DatabaseManager.o
-
-# target to build an object file
-DatabaseManager.cpp.o:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.o
-.PHONY : DatabaseManager.cpp.o
-
-DatabaseManager.i: DatabaseManager.cpp.i
-
-.PHONY : DatabaseManager.i
-
-# target to preprocess a source file
-DatabaseManager.cpp.i:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.i
-.PHONY : DatabaseManager.cpp.i
-
-DatabaseManager.s: DatabaseManager.cpp.s
-
-.PHONY : DatabaseManager.s
-
-# target to generate assembly for a file
-DatabaseManager.cpp.s:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/DatabaseManager.cpp.s
-.PHONY : DatabaseManager.cpp.s
-
 add_product.o: add_product.cpp.o
 
 .PHONY : add_product.o
@@ -231,32 +204,59 @@ addcart.cpp.s:
 	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/addcart.cpp.s
 .PHONY : addcart.cpp.s
 
-main.o: main.cpp.o
+send_message.o: send_message.cpp.o
 
-.PHONY : main.o
+.PHONY : send_message.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/main.cpp.o
-.PHONY : main.cpp.o
+send_message.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message.cpp.o
+.PHONY : send_message.cpp.o
 
-main.i: main.cpp.i
+send_message.i: send_message.cpp.i
 
-.PHONY : main.i
+.PHONY : send_message.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/main.cpp.i
-.PHONY : main.cpp.i
+send_message.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message.cpp.i
+.PHONY : send_message.cpp.i
 
-main.s: main.cpp.s
+send_message.s: send_message.cpp.s
 
-.PHONY : main.s
+.PHONY : send_message.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/main.cpp.s
-.PHONY : main.cpp.s
+send_message.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message.cpp.s
+.PHONY : send_message.cpp.s
+
+send_message_aux.o: send_message_aux.cpp.o
+
+.PHONY : send_message_aux.o
+
+# target to build an object file
+send_message_aux.cpp.o:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message_aux.cpp.o
+.PHONY : send_message_aux.cpp.o
+
+send_message_aux.i: send_message_aux.cpp.i
+
+.PHONY : send_message_aux.i
+
+# target to preprocess a source file
+send_message_aux.cpp.i:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message_aux.cpp.i
+.PHONY : send_message_aux.cpp.i
+
+send_message_aux.s: send_message_aux.cpp.s
+
+.PHONY : send_message_aux.s
+
+# target to generate assembly for a file
+send_message_aux.cpp.s:
+	$(MAKE) -f CMakeFiles/MyCGI.dir/build.make CMakeFiles/MyCGI.dir/send_message_aux.cpp.s
+.PHONY : send_message_aux.cpp.s
 
 # Help Target
 help:
@@ -267,9 +267,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... MyCGI"
-	@echo "... DatabaseManager.o"
-	@echo "... DatabaseManager.i"
-	@echo "... DatabaseManager.s"
 	@echo "... add_product.o"
 	@echo "... add_product.i"
 	@echo "... add_product.s"
@@ -279,9 +276,12 @@ help:
 	@echo "... addcart.o"
 	@echo "... addcart.i"
 	@echo "... addcart.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... send_message.o"
+	@echo "... send_message.i"
+	@echo "... send_message.s"
+	@echo "... send_message_aux.o"
+	@echo "... send_message_aux.i"
+	@echo "... send_message_aux.s"
 .PHONY : help
 
 

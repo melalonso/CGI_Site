@@ -189,9 +189,6 @@ public:
 };
 
 
-
-
-
 int main() {
     DatabaseManager *dbMgr = new DatabaseManager();
     bool isUserLogged = false;
@@ -205,11 +202,12 @@ int main() {
     if (isUserLogged) {
         //User *u = dbMgr->getUserWithCookie(ssid);
         //if (u != nullptr) {
-            //dbMgr->updateUserCookie(u->user_name, "");
-            //delete u;
-            cout << "Set-Cookie: sid=''; Expires=0; HttpOnly;\n";
-            cout << "Location: /cgi-bin/index\n";
-            cout << "Content-type:text/html\r\n\r\n";
+        //dbMgr->updateUserCookie(u->user_name, "");
+        //delete u;
+        cout << "Set-Cookie: sid=''; Expires=0; HttpOnly;\n";
+        //cout << "Location: /cgi-bin/index\n";
+        cout << "Content-type:text/html\r\n\r\n";
+        cout << "<script>window.location.href = 'http://localhost/cgi-bin/index'</script>\n";
         //}
     } else {
         cout << "Content-type:text/html\r\n\r\n";

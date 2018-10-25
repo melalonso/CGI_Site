@@ -174,6 +174,23 @@ public:
         return results;
     }
 
+    vector<Product> searchProducts(string keyword) {
+        vector<Product> results;
+        pstmt = con->prepareStatement("SELECT * from products where name like ? or description like ?;");
+        pstmt->setString(1, keyword);
+        pstmt->setString(2, keyword);
+        res = pstmt->executeQuery();
+        while (res->next()) {
+            int product_id = res->getInt(1);
+            std::string name = res->getString(2);
+            std::string description = res->getString(3);
+            int price = res->getInt(4);
+            Product p(product_id, name, description, price);
+            results.push_back(p);
+        }
+        return results;
+    }
+
     User *getUser(string username) {
         User *user = nullptr;
         stmt = con->createStatement();
@@ -273,16 +290,24 @@ public:
         pstmt->execute();
     }
 
+    void insertMessage(string name, string text) {
+        pstmt = con->prepareStatement(
+                "INSERT INTO messages(name, message) VALUES (?,?)");
+        pstmt->setString(1, name);
+        pstmt->setString(2, text);
+        pstmt->execute();
+    }
+
 
 };
 
 void print_products(vector<Product> products, bool isUserLogged) {
     for (auto product : products) {
         cout << "\t\t<div class='product' style='float:left;'>\n";
-        cout << "\t\t\t<p>Codigo: " << product.product_id << "</p>\n";
-        cout << "\t\t\t<p>Nombre: " << product.name << "</p>\n";
-        cout << "\t\t\t<p>Descripcion: " << product.description << "</p>\n";
-        cout << "\t\t\t<p>Precio: " << product.price << "</p>\n";
+        cout << "\t\t\t<p>Code: " << product.product_id << "</p>\n";
+        cout << "\t\t\t<p>Name: " << product.name << "</p>\n";
+        cout << "\t\t\t<p>Description: " << product.description << "</p>\n";
+        cout << "\t\t\t<p>Price: " << product.price << "</p>\n";
         if (isUserLogged) {
             cout << "<a href=\"/cgi-bin/addcart?pid=" << product.product_id << "\">Add to Cart</a><br><br>\n";
         }
@@ -320,14 +345,15 @@ int main() {
             User *u = dbMgr->getUserWithCookie(parameters["sid"]);
             if (u != nullptr) {
                 string username = u->user_name;
-                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                cout << "<h2> Welcome " << username << " </h2>\n";
                 isUserLogged = true;
             }
         }
     }
 
     cout << "<html>\n"
-            "<head></head>\n"
+            "<head>"
+            "</head>\n"
             "<body>\n"
             "\t<div id='header'><h1>Sitio de Ventas XYZ</h1></div>\n"
             "\t<div id='features'>\n"
@@ -349,7 +375,7 @@ int main() {
                 "\t\t\t\t\t<label for=\"username\"><b>Username</b></label>\n"
                 "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter username\" name=\"username\" required>\n"
                 "\t\t\t\t\t<label for=\"password\"><b>Password</b></label>\n"
-                "\t\t\t\t\t<input type=\"text\" placeholder=\"Enter password\" name=\"password\" required>\t\t\t\t\t\n"
+                "\t\t\t\t\t<input type=\"password\" placeholder=\"Enter password\" name=\"password\" required>\t\t\t\t\t\n"
                 "\t\t\t\t\t<button type=\"submit\">Login</button>\n"
                 "\t\t\t\t</div>\n"
                 "\t\t\t</form>\t\t\t\n"
@@ -366,6 +392,11 @@ int main() {
                 "\t\t\t<h3><a href='/cgi-bin/add_product'>Sell product</a></h3>\n"
                 "\t\t</div>";
     }
+    cout << "\t\t<div id='send_message'>\n"
+            "\t\t\t<h3><a href='/cgi-bin/send_message'>Send message or suggestion</a></h3>\n"
+            "\t\t</div>";
+
+
 
     cout << "\t<div id='content'>\n";
 
