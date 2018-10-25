@@ -6,6 +6,7 @@
 #include <cppconn/statement.h>
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
+#include <curl/curl.h>
 
 using namespace std;
 
@@ -24,17 +25,47 @@ map<string, string> parse(const string &query) {
     return data;
 }
 
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
 int main() {
     cout << "Content-type:text/html\r\n\r\n";
     string input;
     cin >> input;
     map<string, string> parameters = parse(input);
 
-    string name = parameters["name"];
-    string user = parameters["user"];
-    string phone = parameters["phone"];
-    string email = parameters["email"];
-    string password = parameters["password"];
+    string name = decode(parameters["name"]);
+    string user = decode(parameters["user"]);
+    string phone = decode(parameters["phone"]);
+    string email = decode(parameters["email"]);
+    string password = decode(parameters["password"]);
 
 
     sql::Driver *driver;
@@ -61,11 +92,7 @@ int main() {
     delete pstmt;
 
 
-    cout << "<b>Lei</b>\n";
-    for (auto &kv : parameters) {
-        cout << kv.first << " = " << kv.second << "\n";
-    }
-    cout << "Inserted\n";
+    cout << "Usuario registrado de forma exitosa\n";
     cout << "<a href='/cgi-bin/index'>Volver</a>";
 
     // Eliminamos los objetos

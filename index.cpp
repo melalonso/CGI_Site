@@ -64,6 +64,28 @@ public:
     }
 };
 
+class Order {
+public:
+    int orderId;
+    int userId;
+    string shippingAddress;
+    string city;
+    string state;
+    string country;
+
+    Order() {}
+
+    Order(int orderId, int userId, string shippingAddress, string city, string state, string country) {
+        this->orderId = orderId;
+        this->userId = userId;
+        this->shippingAddress = shippingAddress;
+        this->city = city;
+        this->state = state;
+        this->country = country;
+    }
+};
+
+
 class DatabaseManager {
 private:
     sql::Driver *driver;
@@ -227,7 +249,7 @@ public:
     }
 
 
-    void insertOrder(Order o) {
+    long insertOrder(Order o) {
         pstmt = con->prepareStatement(
                 "INSERT INTO orders(user_id, shipping_address, city, state, country) VALUES (?,?,?,?,?)");
         pstmt->setInt(1, o.userId);
@@ -235,7 +257,12 @@ public:
         pstmt->setString(3, o.city);
         pstmt->setString(4, o.state);
         pstmt->setString(5, o.country);
-        pstmt->execute(); // OCUPO EL ORDER ID
+        pstmt->execute();
+        stmt = con->createStatement();
+        sql::ResultSet *res = stmt->executeQuery("SELECT @@identity AS id;");
+        res->next();
+        return res->getInt64("id");
+
     }
 
     void insertOrderProduct(int orderId, int productId) {

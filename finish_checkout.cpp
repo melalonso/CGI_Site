@@ -249,7 +249,7 @@ public:
     }
 
 
-    void insertOrder(Order o) {
+    long insertOrder(Order o) {
         pstmt = con->prepareStatement(
                 "INSERT INTO orders(user_id, shipping_address, city, state, country) VALUES (?,?,?,?,?)");
         pstmt->setInt(1, o.userId);
@@ -257,12 +257,17 @@ public:
         pstmt->setString(3, o.city);
         pstmt->setString(4, o.state);
         pstmt->setString(5, o.country);
-        pstmt->execute(); // OCUPO EL ORDER ID
+        pstmt->execute();
+        stmt = con->createStatement();
+        sql::ResultSet *res = stmt->executeQuery("SELECT @@identity AS id;");
+        res->next();
+        return res->getInt64("id");
+
     }
 
     void insertOrderProduct(int orderId, int productId) {
         pstmt = con->prepareStatement(
-                "INSERT INTO order_products(order_id, user_id) VALUES (?,?)");
+                "INSERT INTO order_products(order_id, product_id) VALUES (?,?)");
         pstmt->setInt(1, orderId);
         pstmt->setInt(2, productId);
         pstmt->execute();
@@ -270,7 +275,7 @@ public:
 
     void cleanShopCart(int userId) {
         stmt = con->createStatement();
-        stmt->executeUpdate("delete from shop_cart where user_id=" + to_string(userId));
+        stmt->execute("delete from shop_cart where user_id=" + to_string(userId));
     }
 
 };
@@ -309,7 +314,7 @@ void printOrderSummary(vector<Product> products, Order order) {
         subTotal += product.price;
     }
     cout << "</ol>\n";
-    total = subTotal + (subTotal * 0.10)
+    total = subTotal + (subTotal * 0.10);
     cout << "<b>Subtotal: " << subTotal << "<br>\n";
     cout << "<b>Total a pagar (subtotal + shipping): " << total << "<br>\n";
 }
@@ -337,6 +342,7 @@ int main() {
 
 
                 vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                cout << "Tengo " << shoppingCartProducts.size() << " products...<br>";
 
                 string input;
                 cin >> input;
@@ -347,13 +353,18 @@ int main() {
                 string city = form_parameters["city"];
                 string state = form_parameters["state"];
                 string country = form_parameters["country"];
+                cout << "Tengo " << city << " y " << state << "<br>";
                 Order order(-1, userId, shippingAddress, city, state, country);
 
                 long orderId = dbMgr->insertOrder(order);
+                cout << "Order id tras insertar es " << orderId << "<br>";
                 for (Product p : shoppingCartProducts) {
+                    cout << "Iterando productos<br>";
+                    cout << "Name: " << p.name << "<br>";
                     int productId = p.product_id;
                     dbMgr->insertOrderProduct(orderId, productId);
                 }
+                cout << "Cleaning shopping cart....<br>";
                 dbMgr->cleanShopCart(userId);
 
                 printOrderSummary(shoppingCartProducts, order);

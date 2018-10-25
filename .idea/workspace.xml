@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/finish_checkout.cpp" line="44" />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
       <config projectName="MyCGI" targetName="MyCGI" />
@@ -12,7 +15,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb2a6a7c-0b9c-4300-90f6-6fbfcc0f664b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/finish_checkout.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/finish_checkout.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/index.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/register.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/register.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/register_aux.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/register_aux.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,6 +35,7 @@
         <counts>
           <entry key="project.closed" value="1" />
           <entry key="project.open.time.0" value="1" />
+          <entry key="project.open.time.27" value="1" />
           <entry key="project.open.time.28" value="1" />
           <entry key="project.open.time.29" value="1" />
           <entry key="project.open.time.30" value="1" />
@@ -35,15 +43,15 @@
           <entry key="project.open.time.32" value="1" />
           <entry key="project.open.time.37" value="2" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.opened" value="9" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="Makefile" value="3" />
           <entry key="Notas" value="2" />
-          <entry key="cpp" value="110" />
-          <entry key="h" value="11" />
+          <entry key="cpp" value="114" />
+          <entry key="h" value="12" />
           <entry key="html" value="4" />
           <entry key="txt" value="1" />
         </counts>
@@ -52,14 +60,14 @@
         <counts>
           <entry key="CMakeLists.txt" value="1" />
           <entry key="HTML" value="4" />
-          <entry key="ObjectiveC" value="121" />
+          <entry key="ObjectiveC" value="126" />
           <entry key="PLAIN_TEXT" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Makefile" value="3" />
-          <entry key="cpp" value="7561" />
+          <entry key="cpp" value="7969" />
           <entry key="h" value="101" />
           <entry key="html" value="73" />
         </counts>
@@ -67,7 +75,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="73" />
-          <entry key="ObjectiveC" value="7662" />
+          <entry key="ObjectiveC" value="8070" />
           <entry key="PLAIN_TEXT" value="3" />
         </counts>
       </usages-collector>
@@ -76,22 +84,22 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/checkout.cpp">
+        <entry file="file://$PROJECT_DIR$/register.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="316" column="75" selection-start-line="316" selection-start-column="59" selection-end-line="316" selection-end-column="75" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
+            <state>
+              <caret column="19" lean-forward="true" selection-start-column="19" selection-end-column="19" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/finish_checkout.cpp">
+        <entry file="file://$PROJECT_DIR$/register_aux.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="388">
-              <caret line="357" lean-forward="true" selection-start-line="357" selection-end-line="357" />
+            <state relative-caret-position="268">
+              <caret line="94" column="48" selection-start-line="94" selection-start-column="48" selection-end-line="94" selection-end-column="48" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -121,12 +129,13 @@
         <option value="$PROJECT_DIR$/logout.cpp" />
         <option value="$PROJECT_DIR$/add_product_aux.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/register_aux.cpp" />
         <option value="$PROJECT_DIR$/login.cpp" />
         <option value="$PROJECT_DIR$/addcart.cpp" />
-        <option value="$PROJECT_DIR$/index.cpp" />
         <option value="$PROJECT_DIR$/checkout.cpp" />
+        <option value="$PROJECT_DIR$/index.cpp" />
         <option value="$PROJECT_DIR$/finish_checkout.cpp" />
+        <option value="$PROJECT_DIR$/register.cpp" />
+        <option value="$PROJECT_DIR$/register_aux.cpp" />
       </list>
     </option>
   </component>
@@ -226,18 +235,19 @@
       <workItem from="1538342854830" duration="4302000" />
       <workItem from="1538508899672" duration="11902000" />
       <workItem from="1538828700268" duration="16241000" />
-      <workItem from="1538906424986" duration="6710000" />
+      <workItem from="1538906424986" duration="8201000" />
+      <workItem from="1540482015952" duration="1839000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67438000" />
+    <option name="totallyTimeSpent" value="70768000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="31" width="1368" height="692" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27265862" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20468278" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -414,34 +424,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/register_aux.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="12" column="50" lean-forward="true" selection-start-line="12" selection-start-column="50" selection-end-line="12" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/register.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" selection-start-line="12" selection-end-line="19" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/addcart.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3780">
           <caret line="252" column="45" selection-start-line="252" selection-start-column="37" selection-end-line="252" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="249" column="2" selection-start-line="249" selection-start-column="2" selection-end-line="249" selection-end-column="2" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -452,20 +438,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/index.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="163">
+          <caret line="66" column="13" lean-forward="true" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/checkout.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="316" column="75" selection-start-line="316" selection-start-column="59" selection-end-line="316" selection-end-column="75" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="133">
+          <caret line="315" column="52" selection-start-line="315" selection-start-column="37" selection-end-line="315" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/finish_checkout.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="357" lean-forward="true" selection-start-line="357" selection-end-line="357" />
+        <state relative-caret-position="118">
+          <caret line="355" column="25" lean-forward="true" selection-start-line="355" selection-start-column="25" selection-end-line="355" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/register.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="19" lean-forward="true" selection-start-column="19" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/curl/curl.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/register_aux.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="268">
+          <caret line="94" column="48" selection-start-line="94" selection-start-column="48" selection-end-line="94" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

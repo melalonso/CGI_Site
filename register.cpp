@@ -11,11 +11,11 @@ int main () {
 	cout << "		<h3> Register new user</h3>" << endl;
 	cout << "		<hr>" << endl;
 	cout << "		<form action=\"/cgi-bin/register_aux\" method=\"post\">" << endl;
-	cout << "			Full name: <input type=\"text\" name=\"name\" required><br>" << endl;
-	cout << "			Username: <input type=\"text\" name=\"user\" required><br>" << endl;
-	cout << "			Phone: <input type=\"text\" name=\"phone\" required><br>" << endl;
-	cout << "			Email: <input type=\"text\" name=\"email\" required><br>" << endl;
-	cout << "			Password: <input type=\"password\" name=\"password\" required><br>" << endl;
+	cout << "			Full name: <input type=\"text\" name=\"name\" maxlength=\"30\" required><br>" << endl;
+	cout << "			Username: <input type=\"text\" name=\"user\" maxlength=\"15\" required><br>" << endl;
+	cout << "			Phone: <input type=\"text\" name=\"phone\" maxlength=\"11\" required><br>" << endl;
+	cout << "			Email: <input type=\"text\" name=\"email\" maxlength=\"30\" required><br>" << endl;
+	cout << "			Password: <input type=\"password\" name=\"password\" maxlength=\"30\" required><br>" << endl;
 	cout << "			<input type=\"submit\" value=\"Register\">" << endl;
 	cout << "		</form>" << endl;
 	cout << "	</div>" << endl;
