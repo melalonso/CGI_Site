@@ -11,6 +11,23 @@
 
 using namespace std;
 
+class ShopCartProduct {
+public:
+    int quantity;
+    int product_id;
+    string name;
+    string description;
+    int price;
+
+    ShopCartProduct(int product_id, string name, string description, int price, int quantity) {
+        this->product_id = product_id;
+        this->name = name;
+        this->description = description;
+        this->price = price;
+        this->quantity = quantity;
+    }
+};
+
 
 class User {
 public:
@@ -159,16 +176,18 @@ public:
         return results;
     }
 
-    vector<Product> getProductsOnShoppingCart(int user_id) {
-        vector<Product> results;
+    vector<ShopCartProduct> getProductsOnShoppingCart(int user_id) {
+        vector<ShopCartProduct> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
                                  "where sc.user_id=" + to_string(user_id) + ";");
         while (res->next()) {
+            int id = res->getInt(5);
             string name = res->getString(6);
             string description = res->getString(7);
             int price = res->getInt(8);
-            Product p(-1, name, description, price);
+            int quantity = res->getInt(3);
+            ShopCartProduct p(id, name, description, price, quantity);
             results.push_back(p);
         }
         return results;
@@ -224,11 +243,13 @@ public:
     }
 
     void setQuantityCartProduct(int userId, int productId, int quantity) {
-        stmt = con->createStatement();
-        stmt->executeUpdate("UPDATE shop_cart SET quantity =" + to_string(quantity) + " " +
-                            "where checkout=0 and user_id=" +
-                            to_string(userId) + " and product_id=" +
-                            to_string(productId));
+        pstmt = con->prepareStatement("UPDATE shop_cart SET quantity =? where checkout=0 and user_id=? "
+                                      "and product_id=?;");
+        pstmt->setInt(1, quantity);
+        pstmt->setInt(2, userId);
+        pstmt->setInt(3, productId);
+        pstmt->execute();
+
     }
 
     void insertCartProduct(int userId, int productId) {
@@ -297,21 +318,21 @@ map<string, string> parse(const string &query) {
 }
 
 
-void printOrderSummary(vector<Product> products) {
+void printOrderSummary(vector<ShopCartProduct> products) {
     int total = 0;
     cout << "<center>\n";
     cout << "<h4>Here's what you have ordered</h4>\n";
-    cout << "<ol>\n";
     for (auto product : products) {
-        cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
-        total += product.price;
+        cout << product.quantity << " " << product.name << " for $" << product.price << " each.<br>";
+        total += product.price * product.quantity;
     }
-    cout << "</ol>\n";
-    cout << "<b>Total a pagar: " << total << "<br>\n";
+    cout << "<b>Total to pay: " << total << "<br>\n";
+    cout << "</center>\n";
 }
 
 
 void printOrderForm() {
+    cout << "<center>\n";
     cout << "<h4>Finish your order</h4>\n";
     cout << "<form action=\"/cgi-bin/finish_checkout\" method=\"post\">" << endl;
     cout << "Shipping address: <input type=\"text\" name=\"shipping_address\" required><br>" << endl;
@@ -320,11 +341,81 @@ void printOrderForm() {
     cout << "Country: <input type=\"text\" name=\"country\" required><br>" << endl;
     cout << "<input type=\"submit\" value=\"Place order\">" << endl;
     cout << "</form>" << endl;
+    cout << "</center>\n";
 }
 
 
+void printShopingCart(vector<ShopCartProduct> products) {
+    int total = 0;
+    cout << "<center>\n";
+    cout << "<h3>Your Shopping Cart</h3>\n";
+    cout << "<form action=\"/cgi-bin/checkout\" method=\"POST\">\n";
+    cout << "<table>\n";
+    cout << "\t<tr>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Name</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Description</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Price</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Quantity</th>\n";
+    cout << "\t</tr>\n";
+    int index = 0;
+    for (auto product : products) {
+        cout << "<tr>\n";
+        cout << "<td align=\"CENTER\">" << product.name << "</td>\n";
+        cout << "<td align=\"CENTER\">" << product.description << "</td>\n";
+        cout << "<td align=\"CENTER\">" << product.price << "</td>\n";
+        cout << "<td align=\"CENTER\"> <input type='text' name='qty" << index << "' value='" << product.quantity
+             << "'></td>\n";
+        total += product.quantity * product.price;
+        cout << "</tr>\n";
+        index++;
+    }
+    cout << "</table>\n";
+    cout << "<b>Total to pay: " << total << "<br>\n";
+    cout << "<input name=\"checkout\" type=\"submit\" value=\"Check Out\">\n"
+            "<input name=\"checkout\" type=\"submit\" value=\"Update Quantities\">\n"
+            "</form>\n"
+            "<a href='http://localhost/cgi-bin/index'>See more products</a>"
+            "</center>\n";
+}
+
+
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
 int main() {
     cout << "Content-type:text/html\r\n\r\n";
+
+    string form_data;
+    cin >> form_data;
+    map<string, string> parametersForm = parse(form_data);
+    string action = decode(parametersForm["checkout"]);
 
     DatabaseManager *dbMgr = new DatabaseManager();
     string sid = "";
@@ -340,12 +431,31 @@ int main() {
             if (u != nullptr) {
                 userId = u->user_id;
                 string username = u->user_name;
-                cout << "<h2> Bienvenido " << username << " </h2>\n";
+                cout << "<h2> Welcome " << username << " </h2>\n";
                 isUserLogged = true;
 
-                vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                printOrderSummary(shoppingCartProducts);
-                printOrderForm();
+                vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                if (action == "Check Out") {
+                    printOrderSummary(shoppingCartProducts);
+                    printOrderForm();
+                } else if (action == "Update Quantities") {
+                    int index = 0;
+                    for (auto product : shoppingCartProducts) {
+                        int newQuantity = stoi(parametersForm["qty" + to_string(index)]);
+                        int productId = product.product_id;
+                        if (newQuantity > 0) {
+                            dbMgr->setQuantityCartProduct(userId, productId, newQuantity);
+                        } else {
+                            dbMgr->deleteProductFromCart(userId, productId);
+                        }
+                        index++;
+                    }
+                    vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                    printShopingCart(shoppingCartProducts);
+                } else {
+                    cout << "<b>Not a valid action</b><br>";
+                    cout << "<a href='http://localhost/cgi-bin/index'>Back</a>";
+                }
 
             }
         }

@@ -14,7 +14,7 @@ int main() {
     cout << "		<form action=\"/cgi-bin/send_message_aux\" method=\"post\" id='send_msg'>" << endl;
     cout << "			Full name: <input type=\"text\" name=\"name\" maxlength=\"30\" required><br>" << endl;
     cout << "           Message: <textarea name='message' rows=\"10\" cols=\"50\"></textarea>" << endl;
-    cout << "			<input type=\"submit\" value=\"Register\">" << endl;
+    cout << "			<input type=\"submit\" value=\"Send\">" << endl;
     cout << "		</form>" << endl;
     cout << "	</div>" << endl;
     cout << "</body>" << endl;

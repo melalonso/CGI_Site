@@ -325,6 +325,37 @@ void printSearchResults(vector<Product> products, bool isUserLogged) {
     }
 }
 
+
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
 int main() {
 
     string search_text;
@@ -333,7 +364,7 @@ int main() {
 
     cout << "Content-type:text/html\r\n\r\n";
 
-    search_text = parameters["product"];
+    search_text = decode(parameters["product"]);
 
     DatabaseManager *dbMgr = new DatabaseManager();
 

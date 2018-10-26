@@ -86,6 +86,24 @@ public:
     }
 };
 
+
+class ShopCartProduct {
+public:
+    int quantity;
+    int product_id;
+    string name;
+    string description;
+    int price;
+
+    ShopCartProduct(int product_id, string name, string description, int price, int quantity) {
+        this->product_id = product_id;
+        this->name = name;
+        this->description = description;
+        this->price = price;
+        this->quantity = quantity;
+    }
+};
+
 class DatabaseManager {
 private:
     sql::Driver *driver;
@@ -159,8 +177,8 @@ public:
         return results;
     }
 
-    vector<Product> getProductsOnShoppingCart(int user_id) {
-        vector<Product> results;
+    vector<ShopCartProduct> getProductsOnShoppingCart(int user_id) {
+        vector<ShopCartProduct> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
                                  "where sc.user_id=" + to_string(user_id) + ";");
@@ -169,7 +187,8 @@ public:
             string name = res->getString(6);
             string description = res->getString(7);
             int price = res->getInt(8);
-            Product p(id, name, description, price);
+            int quantity = res->getInt(3);
+            ShopCartProduct p(id, name, description, price, quantity);
             results.push_back(p);
         }
         return results;
@@ -298,7 +317,7 @@ map<string, string> parse(const string &query) {
 }
 
 
-void printOrderSummary(vector<Product> products, Order order) {
+void printOrderSummary(vector<ShopCartProduct> products, Order order) {
     int total = 0;
     int subTotal = 0;
     cout << "<h2>Thank you!</h2>\n";
@@ -311,12 +330,12 @@ void printOrderSummary(vector<Product> products, Order order) {
     cout << "<ul>\n";
     for (auto product : products) {
         cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
-        subTotal += product.price;
+        subTotal += product.price * product.quantity;
     }
     cout << "</ol>\n";
     total = subTotal + (subTotal * 0.10);
     cout << "<b>Subtotal: " << subTotal << "<br>\n";
-    cout << "<b>Total a pagar (subtotal + shipping): " << total << "<br>\n";
+    cout << "<b>Total to pay (subtotal + shipping): " << total << "<br>\n";
     cout << "<a href='http://localhost/cgi-bin/index'>Back</a>";
 }
 
@@ -342,7 +361,7 @@ int main() {
                 isUserLogged = true;
 
 
-                vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
 
                 string input;
                 cin >> input;
@@ -356,7 +375,7 @@ int main() {
                 Order order(-1, userId, shippingAddress, city, state, country);
 
                 long orderId = dbMgr->insertOrder(order);
-                for (Product p : shoppingCartProducts) {
+                for (ShopCartProduct p : shoppingCartProducts) {
                     int productId = p.product_id;
                     dbMgr->insertOrderProduct(orderId, productId);
                 }

@@ -64,6 +64,23 @@ public:
     }
 };
 
+class ShopCartProduct {
+public:
+    int quantity;
+    int product_id;
+    string name;
+    string description;
+    int price;
+
+    ShopCartProduct(int product_id, string name, string description, int price, int quantity) {
+        this->product_id = product_id;
+        this->name = name;
+        this->description = description;
+        this->price = price;
+        this->quantity = quantity;
+    }
+};
+
 class DatabaseManager {
 private:
     sql::Driver *driver;
@@ -137,8 +154,8 @@ public:
         return results;
     }
 
-    vector<Product> getProductsOnShoppingCart(int user_id) {
-        vector<Product> results;
+    vector<ShopCartProduct> getProductsOnShoppingCart(int user_id) {
+        vector<ShopCartProduct> results;
         stmt = con->createStatement();
         res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
                                  "where sc.user_id=" + to_string(user_id) + ";");
@@ -146,7 +163,8 @@ public:
             string name = res->getString(6);
             string description = res->getString(7);
             int price = res->getInt(8);
-            Product p(-1, name, description, price);
+            int quantity = res->getInt(3);
+            ShopCartProduct p(-1, name, description, price, quantity);
             results.push_back(p);
         }
         return results;
@@ -246,7 +264,7 @@ map<string, string> parse(const string &query) {
 }
 
 
-void printShopingCart(vector<Product> products) {
+void printShopingCart(vector<ShopCartProduct> products) {
     int total = 0;
     cout << "<center>\n";
     cout << "<h3>Your Shopping Cart</h3>\n";
@@ -256,18 +274,24 @@ void printShopingCart(vector<Product> products) {
     cout << "\t<th bgcolor=\"#cccccc\">Name</th>\n";
     cout << "\t<th bgcolor=\"#cccccc\">Description</th>\n";
     cout << "\t<th bgcolor=\"#cccccc\">Price</th>\n";
+    cout << "\t<th bgcolor=\"#cccccc\">Quantity</th>\n";
     cout << "\t</tr>\n";
+    int index = 0;
     for (auto product : products) {
         cout << "<tr>\n";
         cout << "<td align=\"CENTER\">" << product.name << "</td>\n";
         cout << "<td align=\"CENTER\">" << product.description << "</td>\n";
         cout << "<td align=\"CENTER\">" << product.price << "</td>\n";
-        total += product.price;
+        cout << "<td align=\"CENTER\"> <input type='text' name='qty" << index << "' value='" << product.quantity
+             << "'></td>\n";
+        total += product.quantity * product.price;
         cout << "</tr>\n";
+        index++;
     }
     cout << "</table>\n";
     cout << "<b>Total to pay: " << total << "<br>\n";
-    cout << "<input name=\"cartact\" type=\"submit\" value=\"Check Out\">\n"
+    cout << "<input name=\"checkout\" type=\"submit\" value=\"Check Out\">\n"
+            "<input name=\"checkout\" type=\"submit\" value=\"Update Quantities\">\n"
             "</form>\n"
             "<a href='http://localhost/cgi-bin/index'>See more products</a>"
             "</center>\n";
@@ -309,7 +333,7 @@ int main() {
                     }
                 }
 
-                vector<Product> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
                 printShopingCart(shoppingCartProducts);
 
             }
