@@ -14,7 +14,7 @@ insert into shopcart values(?,?,?)
 
 
 
-create table users (user_id int NOT NULL AUTO_INCREMENT, full_name varchar(100), user_name varchar(20), email VARCHAR(30), phone VARCHAR(15), password VARCHAR(30), cookie_id VARCHAR(50), PRIMARY KEY (user_id));
+create table users (user_id int NOT NULL AUTO_INCREMENT, full_name varchar(100), user_name varchar(20), email VARCHAR(30), phone VARCHAR(15), password VARCHAR(100), cookie_id VARCHAR(50), salt VARCHAR(40),PRIMARY KEY (user_id));
 
 create table products (product_id int NOT NULL AUTO_INCREMENT, name varchar(30), description varchar(300), price int, PRIMARY KEY (product_id));
 
@@ -38,3 +38,11 @@ create table order_products (order_id int, product_id int, PRIMARY KEY (order_id
 
 ===== INSERTS =======
 insert into shop_cart (user_id, product_id, quantity, checkout) values (1, 6, 1, 0);
+
+
+
+
+
+Libraries
+
+https://github.com/trusch/libbcrypt

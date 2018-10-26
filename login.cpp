@@ -9,6 +9,7 @@
 #include <cppconn/statement.h>
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
+#include "bcrypt/BCrypt.hpp"
 
 using namespace std;
 
@@ -22,11 +23,12 @@ public:
     string phone;
     string password;
     string cookie_id;
+    string salt;
 
     User() {}
 
     User(int user_id, string full_name, string user_name, string email, string phone, string password,
-         string cookie_id) {
+         string cookie_id, string salt) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
@@ -34,6 +36,7 @@ public:
         this->phone = phone;
         this->password = password;
         this->cookie_id = cookie_id;
+        this->salt = salt;
     }
 };
 
@@ -91,12 +94,13 @@ public:
 
     void insertUser(User u) {
         pstmt = con->prepareStatement(
-                "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
+                "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?,?)");
         pstmt->setString(1, u.full_name);
         pstmt->setString(2, u.user_name);
         pstmt->setString(3, u.email);
         pstmt->setString(4, u.phone);
         pstmt->setString(5, u.password);
+        pstmt->setString(6, u.salt);
         pstmt->execute();
     }
 
@@ -184,7 +188,8 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt);
         }
         return user;
     }
@@ -202,7 +207,8 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt);
         }
         return user;
     }
@@ -241,12 +247,43 @@ string genRandomString(int size) {
     return randomString;
 }
 
+
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
 int main() {
     string login_data;
     cin >> login_data;
     map<string, string> parameters = parse(login_data);
-    string username = parameters["username"];
-    string password = parameters["password"];
+    string username = decode(parameters["username"]);
+    string password = decode(parameters["password"]);
 
 
     DatabaseManager *dbMgr = new DatabaseManager();
@@ -254,8 +291,12 @@ int main() {
     User *u = dbMgr->getUser(username);
 
     if (u != nullptr) {
-        string stored_password = u->password;
-        if (password == stored_password) {
+        BCrypt bcrypt;
+        string hashedPassword = u->password;
+
+        bool valid = bcrypt.validatePassword(password + u->salt, hashedPassword);
+
+        if (valid) {
             string mySid = genRandomString(32);
             cout << "Set-Cookie: sid=" << mySid << "; Max-Age=3600; HttpOnly\n";
             dbMgr->updateUserCookie(username, mySid);
