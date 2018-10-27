@@ -303,7 +303,7 @@ public:
 
 void print_products(vector<Product> products, bool isUserLogged) {
     for (auto product : products) {
-        cout << "\t\t<div class='product' style='float:left;'>\n";
+        cout << "\t\t<div class='product' style='float:left; padding: 5px;' >\n";
         cout << "\t\t\t<p>Code: " << product.product_id << "</p>\n";
         cout << "\t\t\t<p>Name: " << product.name << "</p>\n";
         cout << "\t\t\t<p>Description: " << product.description << "</p>\n";

@@ -301,7 +301,7 @@ int main() {
             cout << "Set-Cookie: sid=" << mySid << "; Max-Age=3600; HttpOnly\n";
             dbMgr->updateUserCookie(username, mySid);
             //cout << "Location: /cgi-bin/index\n";
-            cout << "Refresh: 1; url=http://localhost/cgi-bin/index/\n";
+            cout << "Refresh: 1; url=/cgi-bin/index/\n";
             cout << "Content-type:text/html\r\n\r\n";
             cout << "Logging in user....<br>";
         } else {

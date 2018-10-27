@@ -54,19 +54,41 @@ string decode(string src) {
     return res;
 }
 
+
+/* returns Str with all characters with special HTML meanings converted to
+  entity references. */
+string escapeHTML(string &Str) {
+    string escaped = "";
+    for (int i = 0; i < Str.size(); ++i) {
+        string ThisCh = Str.substr(i, 1);
+        if (ThisCh == "<")
+            ThisCh = "&lt;";
+        else if (ThisCh == ">")
+            ThisCh = "&gt;";
+        else if (ThisCh == "\"")
+            ThisCh = "&quot;";
+        else if (ThisCh == "'")
+            ThisCh = "&apos;";
+        else if (ThisCh == "&")
+            ThisCh = "&amp;";
+        escaped += ThisCh;
+    }
+    return escaped;
+}
+
 int main() {
 
-    string s = "";
-    string line;
-    while (cin >> line) {
-        s = s + line;
-    }
+    string s;
+    cin >> s;
     map<string, string> parameters = parse(s);
 
     string name = decode(parameters["name"]);
     string description = decode(parameters["description"]);
     string price = decode(parameters["price"]);
 
+    name = escapeHTML(name);
+    description = escapeHTML(description);
+    price = escapeHTML(price);
 
     sql::Driver *driver;
     sql::Connection *connection;
@@ -81,8 +103,7 @@ int main() {
 
 
     /* '?' is the supported placeholder syntax */
-    pstmt = connection->prepareStatement(
-            "INSERT INTO products(name, description, price) VALUES (?,?,?)");
+    pstmt = connection->prepareStatement("INSERT INTO products(name, description, price) VALUES (?,?,?)");
     pstmt->setString(1, name);
     pstmt->setString(2, description);
     pstmt->setInt(3, stoi(price));

@@ -11,8 +11,8 @@ int main () {
     cout << "		<h3> Sell product </h3>" << endl;
     cout << "		<hr>" << endl;
     cout << "		<form action=\"/cgi-bin/add_product_aux\" method=\"post\">" << endl;
-    cout << "			Name: <input type=\"text\" name=\"name\" required><br>" << endl;
-    cout << "			Description: <input type=\"text\" name=\"description\" required><br>" << endl;
+    cout << "			Name: <input type=\"text\" name=\"name\" maxlength='50' required><br>" << endl;
+    cout << "			Description: <input type=\"text\" maxlength='110' name=\"description\" required><br>" << endl;
     cout << "			Price: <input type=\"number\" name=\"price\" required><br>" << endl;
     cout << "			<input type=\"submit\" value=\"Add\">" << endl;
     cout << "		</form>" << endl;

@@ -336,7 +336,7 @@ void printOrderSummary(vector<ShopCartProduct> products, Order order) {
     total = subTotal + (subTotal * 0.10);
     cout << "<b>Subtotal: " << subTotal << "<br>\n";
     cout << "<b>Total to pay (subtotal + shipping): " << total << "<br>\n";
-    cout << "<a href='http://localhost/cgi-bin/index'>Back</a>";
+    cout << "<a href='/cgi-bin/index'>Back</a>";
 }
 
 

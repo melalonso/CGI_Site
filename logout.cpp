@@ -207,7 +207,7 @@ int main() {
         cout << "Set-Cookie: sid=''; Expires=0; HttpOnly;\n";
         //cout << "Location: /cgi-bin/index\n";
         cout << "Content-type:text/html\r\n\r\n";
-        cout << "<script>window.location.href = 'http://localhost/cgi-bin/index'</script>\n";
+        cout << "<script>window.location.href = '/cgi-bin/index'</script>\n";
         //}
     } else {
         cout << "Content-type:text/html\r\n\r\n";

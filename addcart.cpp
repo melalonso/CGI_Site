@@ -293,7 +293,7 @@ void printShopingCart(vector<ShopCartProduct> products) {
     cout << "<input name=\"checkout\" type=\"submit\" value=\"Check Out\">\n"
             "<input name=\"checkout\" type=\"submit\" value=\"Update Quantities\">\n"
             "</form>\n"
-            "<a href='http://localhost/cgi-bin/index'>See more products</a>"
+            "<a href='/cgi-bin/index'>See more products</a>"
             "</center>\n";
 }
 

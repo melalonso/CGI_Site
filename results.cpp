@@ -388,7 +388,7 @@ int main() {
     vector<Product> products = dbMgr->searchProducts(search_text);
     printSearchResults(products, isUserLogged);
     cout << "<br>";
-    cout << "<a href='http://localhost/cgi-bin/index'>Back</a>";
+    cout << "<a href='/cgi-bin/index'>Back</a>";
     return 0;
 }
 

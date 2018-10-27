@@ -46,3 +46,11 @@ insert into shop_cart (user_id, product_id, quantity, checkout) values (1, 6, 1,
 Libraries
 
 https://github.com/trusch/libbcrypt
+
+
+
+
+
+grant insert, select, update, delete on `sitio_ventas`.* to 'melalonso'@'%';
+
+https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-for-debian-8
