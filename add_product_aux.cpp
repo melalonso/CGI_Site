@@ -110,6 +110,7 @@ int main() {
     pstmt->execute();
     delete pstmt;
 
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
     cout << "Product was inserted<br>";
     cout << "<a href='/cgi-bin/index'>Volver</a>";

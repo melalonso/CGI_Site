@@ -199,15 +199,17 @@ int main() {
         isUserLogged = true;
     }
 
+    cout << "X-Frame-Options: DENY\n";
+
     if (isUserLogged) {
         //User *u = dbMgr->getUserWithCookie(ssid);
         //if (u != nullptr) {
         //dbMgr->updateUserCookie(u->user_name, "");
         //delete u;
-        cout << "Set-Cookie: sid=''; Expires=0; HttpOnly;\n";
+        cout << "Set-Cookie: sid=''; Expires=0; HttpOnly; Secure;\n";
         //cout << "Location: /cgi-bin/index\n";
         cout << "Content-type:text/html\r\n\r\n";
-        cout << "<script>window.location.href = '/cgi-bin/index'</script>\n";
+        cout << "<script>window.location.href = 'https://172.24.131.14/cgi-bin/index'</script>\n";
         //}
     } else {
         cout << "Content-type:text/html\r\n\r\n";

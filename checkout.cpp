@@ -410,6 +410,7 @@ string decode(string src) {
 }
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
 
     string form_data;

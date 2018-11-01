@@ -285,11 +285,12 @@ public:
 
     }
 
-    void insertOrderProduct(int orderId, int productId) {
+    void insertOrderProduct(int orderId, int productId, int quantity) {
         pstmt = con->prepareStatement(
-                "INSERT INTO order_products(order_id, product_id) VALUES (?,?)");
+                "INSERT INTO order_products(order_id, product_id, quantity) VALUES (?,?, ?)");
         pstmt->setInt(1, orderId);
         pstmt->setInt(2, productId);
+        pstmt->setInt(3, quantity);
         pstmt->execute();
     }
 
@@ -329,7 +330,7 @@ void printOrderSummary(vector<ShopCartProduct> products, Order order) {
     cout << "<h4>Products: </h4>\n";
     cout << "<ul>\n";
     for (auto product : products) {
-        cout << "<li>" << product.name << ": $" << product.price << "</li>\n";
+        cout << "<li>" << product.quantity << " " << product.name << " for $" << product.price << " each.</li>\n";
         subTotal += product.price * product.quantity;
     }
     cout << "</ol>\n";
@@ -341,6 +342,7 @@ void printOrderSummary(vector<ShopCartProduct> products, Order order) {
 
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
 
     DatabaseManager *dbMgr = new DatabaseManager();
@@ -377,7 +379,8 @@ int main() {
                 long orderId = dbMgr->insertOrder(order);
                 for (ShopCartProduct p : shoppingCartProducts) {
                     int productId = p.product_id;
-                    dbMgr->insertOrderProduct(orderId, productId);
+                    int quantity = p.quantity;
+                    dbMgr->insertOrderProduct(orderId, productId, quantity);
                 }
                 dbMgr->cleanShopCart(userId);
                 printOrderSummary(shoppingCartProducts, order);

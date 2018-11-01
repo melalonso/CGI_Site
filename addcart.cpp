@@ -299,6 +299,7 @@ void printShopingCart(vector<ShopCartProduct> products) {
 
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
 
     DatabaseManager *dbMgr = new DatabaseManager();

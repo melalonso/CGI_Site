@@ -362,6 +362,7 @@ int main() {
     cin >> search_text;
     map<string, string> parameters = parse(search_text);
 
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
 
     search_text = decode(parameters["product"]);

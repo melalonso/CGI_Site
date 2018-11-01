@@ -290,6 +290,8 @@ int main() {
 
     User *u = dbMgr->getUser(username);
 
+    cout << "X-Frame-Options: DENY\n";
+
     if (u != nullptr) {
         BCrypt bcrypt;
         string hashedPassword = u->password;
@@ -298,10 +300,10 @@ int main() {
 
         if (valid) {
             string mySid = genRandomString(32);
-            cout << "Set-Cookie: sid=" << mySid << "; Max-Age=3600; HttpOnly\n";
+            cout << "Set-Cookie: sid=" << mySid << "; HttpOnly; Secure; SameSite=strict;\n";
             dbMgr->updateUserCookie(username, mySid);
             //cout << "Location: /cgi-bin/index\n";
-            cout << "Refresh: 1; url=/cgi-bin/index/\n";
+            cout << "Refresh: 2; url=https://172.24.131.14/cgi-bin/index/\n";
             cout << "Content-type:text/html\r\n\r\n";
             cout << "Logging in user....<br>";
         } else {

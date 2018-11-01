@@ -333,6 +333,7 @@ map<string, string> parse(const string &query) {
 
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
     DatabaseManager *dbMgr = new DatabaseManager();
     bool isUserLogged = false;

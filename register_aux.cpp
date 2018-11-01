@@ -279,6 +279,7 @@ string genRandomString(int size) {
 }
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
     string input;
     cin >> input;

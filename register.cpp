@@ -2,6 +2,7 @@
 using namespace std;
 
 int main () {
+	cout << "X-Frame-Options: DENY\n";
 	cout << "Content-type:text/html\r\n\r\n";
 	cout << "<html>" << endl;
 	cout << "<head></head>" << endl;

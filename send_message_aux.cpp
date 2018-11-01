@@ -359,8 +359,30 @@ string decode(string src) {
     return res;
 }
 
+/* returns Str with all characters with special HTML meanings converted to
+  entity references. */
+string escapeHTML(string &Str) {
+    string escaped = "";
+    for (int i = 0; i < Str.size(); ++i) {
+        string ThisCh = Str.substr(i, 1);
+        if (ThisCh == "<")
+            ThisCh = "&lt;";
+        else if (ThisCh == ">")
+            ThisCh = "&gt;";
+        else if (ThisCh == "\"")
+            ThisCh = "&quot;";
+        else if (ThisCh == "'")
+            ThisCh = "&apos;";
+        else if (ThisCh == "&")
+            ThisCh = "&amp;";
+        escaped += ThisCh;
+    }
+    return escaped;
+}
+
 
 int main() {
+    cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
     DatabaseManager *dbMgr = new DatabaseManager();
 
@@ -370,6 +392,8 @@ int main() {
 
     string name = decode(parameters["name"]);
     string message = decode(parameters["message"]);
+    name = escapeHTML(name);
+    message = escapeHTML(message);
 
 
     dbMgr->insertMessage(name, message);
