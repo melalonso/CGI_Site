@@ -21,11 +21,14 @@ public:
     string phone;
     string password;
     string cookie_id;
+    string salt;
+    string agent;
+    string ip;
 
     User() {}
 
     User(int user_id, string full_name, string user_name, string email, string phone, string password,
-         string cookie_id) {
+         string cookie_id, string salt, string agent, string ip) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
@@ -33,6 +36,9 @@ public:
         this->phone = phone;
         this->password = password;
         this->cookie_id = cookie_id;
+        this->salt = salt;
+        this->agent = agent;
+        this->ip = ip;
     }
 };
 
@@ -203,15 +209,19 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -220,7 +230,10 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
@@ -332,25 +345,35 @@ map<string, string> parse(const string &query) {
 }
 
 
-int main() {
-    cout << "X-Frame-Options: DENY\n";
-    cout << "Content-type:text/html\r\n\r\n";
-    DatabaseManager *dbMgr = new DatabaseManager();
-    bool isUserLogged = false;
+bool checkUserLogged() {
+    DatabaseManager *dbMgr2 = new DatabaseManager();
     string ssid = "";
-
     if (const char *env_p = std::getenv("HTTP_COOKIE")) {
         ssid = string(env_p);
         map<string, string> parameters = parse(ssid);
         if (!parameters.empty() && parameters["sid"] != "") {
-            User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+            string agent = string(getenv("HTTP_USER_AGENT"));
+            string ip = string(getenv("REMOTE_ADDR"));
+
+            User *u = dbMgr2->getUserWithCookie(parameters["sid"]);
             if (u != nullptr) {
-                string username = u->user_name;
-                cout << "<h2> Welcome " << username << " </h2>\n";
-                isUserLogged = true;
+                if (u->agent == agent && u->ip == ip) {
+                    string username = u->user_name;
+                    cout << "<h2> Welcome " << username << " </h2>\n";
+                    return true;
+                }
             }
         }
     }
+    return false;
+}
+
+
+int main() {
+    cout << "X-Frame-Options: DENY\n";
+    cout << "Content-type:text/html\r\n\r\n";
+    DatabaseManager *dbMgr = new DatabaseManager();
+    bool isUserLogged = checkUserLogged();
 
     cout << "<html>\n"
             "<head>"
@@ -396,7 +419,6 @@ int main() {
     cout << "\t\t<div id='send_message'>\n"
             "\t\t\t<h3><a href='/cgi-bin/send_message'>Send message or suggestion</a></h3>\n"
             "\t\t</div>";
-
 
 
     cout << "\t<div id='content'>\n";

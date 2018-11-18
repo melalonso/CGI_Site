@@ -365,7 +365,8 @@ int main() {
     cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
 
-    search_text = decode(parameters["product"]);
+    string product = decode(parameters["product"]);
+    product = product.substr(0, 100);
 
     DatabaseManager *dbMgr = new DatabaseManager();
 
@@ -386,7 +387,7 @@ int main() {
     }
 
 
-    vector<Product> products = dbMgr->searchProducts(search_text);
+    vector<Product> products = dbMgr->searchProducts(product);
     printSearchResults(products, isUserLogged);
     cout << "<br>";
     cout << "<a href='/cgi-bin/index'>Back</a>";

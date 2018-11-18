@@ -11,6 +11,11 @@
 #include <cppconn/prepared_statement.h>
 #include "bcrypt/BCrypt.hpp"
 
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+
 using namespace std;
 
 
@@ -24,11 +29,13 @@ public:
     string password;
     string cookie_id;
     string salt;
+    string agent;
+    string ip;
 
     User() {}
 
     User(int user_id, string full_name, string user_name, string email, string phone, string password,
-         string cookie_id, string salt) {
+         string cookie_id, string salt, string agent, string ip) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
@@ -37,6 +44,8 @@ public:
         this->password = password;
         this->cookie_id = cookie_id;
         this->salt = salt;
+        this->agent = agent;
+        this->ip = ip;
     }
 };
 
@@ -101,12 +110,20 @@ public:
         pstmt->setString(4, u.phone);
         pstmt->setString(5, u.password);
         pstmt->setString(6, u.salt);
+        pstmt->setString(7, u.agent);
+        pstmt->setString(8, u.ip);
         pstmt->execute();
     }
 
-    void updateUserCookie(string username, string cookieId) { // cookie of session
-        stmt = con->createStatement();
-        stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
+    void updateUserCookie(string username, string cookieId, string agent, string ip) { // cookie of session
+        pstmt = con->prepareStatement(
+                "UPDATE users SET cookie_id = ?, agent=?, ip=? WHERE user_name = ?");
+        pstmt->setString(1, cookieId);
+        pstmt->setString(2, agent);
+        pstmt->setString(3, ip);
+        pstmt->setString(4, username);
+        pstmt->execute();
+
     }
 
     void insertProduct(Product p) {
@@ -189,7 +206,9 @@ public:
             string password = res->getString(6);
             string cookie_id = res->getString(7);
             string salt = res->getString(8);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
@@ -197,8 +216,9 @@ public:
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -208,7 +228,9 @@ public:
             string password = res->getString(6);
             string cookie_id = res->getString(7);
             string salt = res->getString(8);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
@@ -231,7 +253,7 @@ map<string, string> parse(const string &query) {
     return data;
 }
 
-string alphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*abcdefghijklmnopqrstuvwxyz";
+string alphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^*abcdefghijklmnopqrstuvwxyz";
 
 int stringLength = alphanumeric.length();
 
@@ -278,6 +300,31 @@ string decode(string src) {
     return res;
 }
 
+bool isNumber(const std::string &s) {
+    return !s.empty() && std::find_if(s.begin(),
+                                      s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
+
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
 int main() {
     string login_data;
     cin >> login_data;
@@ -292,6 +339,14 @@ int main() {
 
     cout << "X-Frame-Options: DENY\n";
 
+    if (trim(username) == "" || trim(password) == "") {
+        cout << "Content-type:text/html\r\n\r\n";
+        cout << "Data could not be empty<br>\n";
+        cout << "<a href='/cgi-bin/index'>Back</a>";
+        return 0;
+    }
+
+
     if (u != nullptr) {
         BCrypt bcrypt;
         string hashedPassword = u->password;
@@ -300,10 +355,15 @@ int main() {
 
         if (valid) {
             string mySid = genRandomString(32);
-            cout << "Set-Cookie: sid=" << mySid << "; HttpOnly; Secure; SameSite=strict;\n";
-            dbMgr->updateUserCookie(username, mySid);
+            string agent = string(getenv("HTTP_USER_AGENT"));
+            string ip = string(getenv("REMOTE_ADDR"));
+
+
+            //dbMgr->updateUserCookie(username, mySid);
+            dbMgr->updateUserCookie(username, mySid, agent, ip);
             //cout << "Location: /cgi-bin/index\n";
-            cout << "Refresh: 2; url=https://172.24.131.14/cgi-bin/index/\n";
+            cout << "Refresh: 2; url=https://192.168.1.7/cgi-bin/index/\n";
+            cout << "Set-Cookie: sid=" << mySid << "; HttpOnly; Secure; SameSite=strict;\n";
             cout << "Content-type:text/html\r\n\r\n";
             cout << "Logging in user....<br>";
         } else {

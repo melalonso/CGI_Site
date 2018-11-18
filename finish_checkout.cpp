@@ -9,6 +9,11 @@
 #include <cstdlib>
 #include <cppconn/prepared_statement.h>
 
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+
 using namespace std;
 
 
@@ -21,11 +26,14 @@ public:
     string phone;
     string password;
     string cookie_id;
+    string salt;
+    string agent;
+    string ip;
 
     User() {}
 
     User(int user_id, string full_name, string user_name, string email, string phone, string password,
-         string cookie_id) {
+         string cookie_id, string salt, string agent, string ip) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
@@ -33,6 +41,9 @@ public:
         this->phone = phone;
         this->password = password;
         this->cookie_id = cookie_id;
+        this->salt = salt;
+        this->agent = agent;
+        this->ip = ip;
     }
 };
 
@@ -206,15 +217,19 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -223,11 +238,13 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
-
 
     bool isProductAlreadyOnCart(int userId, int productId) {
         string query = "select * from shop_cart where checkout=0 and "
@@ -287,7 +304,7 @@ public:
 
     void insertOrderProduct(int orderId, int productId, int quantity) {
         pstmt = con->prepareStatement(
-                "INSERT INTO order_products(order_id, product_id, quantity) VALUES (?,?, ?)");
+                "INSERT INTO order_products(order_id, product_id, quantity) VALUES (?,?,?)");
         pstmt->setInt(1, orderId);
         pstmt->setInt(2, productId);
         pstmt->setInt(3, quantity);
@@ -317,6 +334,29 @@ map<string, string> parse(const string &query) {
     return data;
 }
 
+bool checkUserLogged() {
+    DatabaseManager *dbMgr2 = new DatabaseManager();
+    string ssid = "";
+    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+        ssid = string(env_p);
+        map<string, string> parameters = parse(ssid);
+        if (!parameters.empty() && parameters["sid"] != "") {
+            string agent = string(getenv("HTTP_USER_AGENT"));
+            string ip = string(getenv("REMOTE_ADDR"));
+
+            User *u = dbMgr2->getUserWithCookie(parameters["sid"]);
+            if (u != nullptr) {
+                if (u->agent == agent && u->ip == ip) {
+                    string username = u->user_name;
+                    cout << "<h2> Welcome " << username << " </h2>\n";
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
 void printOrderSummary(vector<ShopCartProduct> products, Order order) {
     int total = 0;
@@ -340,6 +380,78 @@ void printOrderSummary(vector<ShopCartProduct> products, Order order) {
     cout << "<a href='/cgi-bin/index'>Back</a>";
 }
 
+string decode(string src) {
+    char a, b;
+    int srcIndex = 0;
+    string res;
+    while (srcIndex < src.size()) {
+        if ((src[srcIndex] == '%') &&
+            ((a = src[srcIndex + 1]) && (b = src[srcIndex + 2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a') a -= 'a' - 'A';
+            if (a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if (b >= 'a') b -= 'a' - 'A';
+
+            if (b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+
+            res += 16 * a + b;
+            srcIndex += 3;
+        } else if (src[srcIndex] == '+') {
+            res += ' ';
+            srcIndex++;
+        } else {
+            res += src[srcIndex];
+            srcIndex++;
+        }
+    }
+    return res;
+}
+
+
+/* returns Str with all characters with special HTML meanings converted to
+  entity references. */
+string escapeHTML(string &Str) {
+    string escaped = "";
+    for (int i = 0; i < Str.size(); ++i) {
+        string ThisCh = Str.substr(i, 1);
+        if (ThisCh == "<")
+            ThisCh = "&lt;";
+        else if (ThisCh == ">")
+            ThisCh = "&gt;";
+        else if (ThisCh == "\"")
+            ThisCh = "&quot;";
+        else if (ThisCh == "'")
+            ThisCh = "&apos;";
+        else if (ThisCh == "&")
+            ThisCh = "&amp;";
+        escaped += ThisCh;
+    }
+    return escaped;
+}
+
+
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
 
 int main() {
     cout << "X-Frame-Options: DENY\n";
@@ -349,44 +461,65 @@ int main() {
     string sid = "";
     int userId = -1;
     int productId = -1;
-    bool isUserLogged = false;
+    bool isUserLogged = checkUserLogged();
 
-    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        sid = string(env_p);
-        map<string, string> parameters = parse(sid);
-        if (!parameters.empty() && parameters["sid"] != "") {
-            User *u = dbMgr->getUserWithCookie(parameters["sid"]);
-            if (u != nullptr) {
-                userId = u->user_id;
-                string username = u->user_name;
-                cout << "<h2> Welcome " << username << " </h2>\n";
-                isUserLogged = true;
+    if (isUserLogged) {
+
+        if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+            sid = string(env_p);
+            map<string, string> parameters = parse(sid);
+            if (!parameters.empty() && parameters["sid"] != "") {
+                User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+                if (u != nullptr) {
+                    userId = u->user_id;
+                    string username = u->user_name;
+
+                    vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+
+                    string input;
+                    cin >> input;
+                    map<string, string> form_parameters;
+                    form_parameters = parse(input);
+
+                    string shippingAddress = decode(form_parameters["shipping_address"]);
+                    string city = decode(form_parameters["city"]);
+                    string state = decode(form_parameters["state"]);
+                    string country = decode(form_parameters["country"]);
+                    shippingAddress = escapeHTML(shippingAddress);
+                    city = escapeHTML(city);
+                    state = escapeHTML(state);
+                    country = escapeHTML(country);
 
 
-                vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                    if (shippingAddress.size() > 100 || city.size() > 50 || state.size() > 50 || country.size() > 50) {
+                        cout << "Max lengths are 100 for shipping address and 50 for city, state and country<br>";
+                        cout << "<a href='/cgi-bin/index'>Volver</a>";
+                        return 0;
+                    } else if (trim(shippingAddress) == "" || trim(city) == "" || trim(state) == "" ||
+                               trim(country) == "") {
+                        cout << "Data could not be empty<br>";
+                        cout << "<a href='/cgi-bin/index'>Volver</a>";
+                        return 0;
+                    }
 
-                string input;
-                cin >> input;
-                map<string, string> form_parameters;
-                form_parameters = parse(input);
+                    Order order(-1, userId, shippingAddress, city, state, country);
 
-                string shippingAddress = form_parameters["shipping_address"];
-                string city = form_parameters["city"];
-                string state = form_parameters["state"];
-                string country = form_parameters["country"];
-                Order order(-1, userId, shippingAddress, city, state, country);
 
-                long orderId = dbMgr->insertOrder(order);
-                for (ShopCartProduct p : shoppingCartProducts) {
-                    int productId = p.product_id;
-                    int quantity = p.quantity;
-                    dbMgr->insertOrderProduct(orderId, productId, quantity);
+                    long orderId = dbMgr->insertOrder(order);
+                    for (ShopCartProduct p : shoppingCartProducts) {
+                        int productId = p.product_id;
+                        int quantity = p.quantity;
+                        dbMgr->insertOrderProduct(orderId, productId, quantity);
+                    }
+                    dbMgr->cleanShopCart(userId);
+                    printOrderSummary(shoppingCartProducts, order);
+
                 }
-                dbMgr->cleanShopCart(userId);
-                printOrderSummary(shoppingCartProducts, order);
-
             }
         }
+    } else {
+        cout << "Log back in<br>";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
     }
 
     return 0;

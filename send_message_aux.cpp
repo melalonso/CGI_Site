@@ -7,6 +7,11 @@
 #include <regex>
 #include <cppconn/prepared_statement.h>
 
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+
 using namespace std;
 
 
@@ -380,6 +385,25 @@ string escapeHTML(string &Str) {
     return escaped;
 }
 
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
 
 int main() {
     cout << "X-Frame-Options: DENY\n";
@@ -395,6 +419,14 @@ int main() {
     name = escapeHTML(name);
     message = escapeHTML(message);
 
+    if (name.size() > 50) name = name.substr(0, 50);
+    if (message.size() > 300) message = message.substr(300);
+
+    if (trim(name) == "" || trim(message) == "") {
+        cout << "Values could not be empty nor be spaces<br>";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
+        return 0;
+    }
 
     dbMgr->insertMessage(name, message);
     cout << "Message was sent sucessfully<br>";

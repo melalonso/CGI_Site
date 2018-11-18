@@ -38,11 +38,14 @@ public:
     string phone;
     string password;
     string cookie_id;
+    string salt;
+    string agent;
+    string ip;
 
     User() {}
 
     User(int user_id, string full_name, string user_name, string email, string phone, string password,
-         string cookie_id) {
+         string cookie_id, string salt, string agent, string ip) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
@@ -50,6 +53,9 @@ public:
         this->phone = phone;
         this->password = password;
         this->cookie_id = cookie_id;
+        this->salt = salt;
+        this->agent = agent;
+        this->ip = ip;
     }
 };
 
@@ -178,16 +184,18 @@ public:
 
     vector<ShopCartProduct> getProductsOnShoppingCart(int user_id) {
         vector<ShopCartProduct> results;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
-                                 "where sc.user_id=" + to_string(user_id) + ";");
+        pstmt = con->prepareStatement(
+                "select * from shop_cart sc join products pr on sc.product_id=pr.product_id "
+                "where sc.user_id=?;");
+        pstmt->setInt(1, user_id);
+        res = pstmt->executeQuery();
         while (res->next()) {
-            int id = res->getInt(5);
+            int productId = res->getInt(5);
             string name = res->getString(6);
             string description = res->getString(7);
             int price = res->getInt(8);
             int quantity = res->getInt(3);
-            ShopCartProduct p(id, name, description, price, quantity);
+            ShopCartProduct p(productId, name, description, price, quantity);
             results.push_back(p);
         }
         return results;
@@ -205,15 +213,19 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -222,7 +234,10 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
+            string salt = res->getString(8);
+            string agent = res->getString(9);
+            string ip = res->getString(10);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id, salt, agent, ip);
         }
         return user;
     }
@@ -264,9 +279,12 @@ public:
 
 
     void deleteProductFromCart(int userId, int productId) {
-        stmt = con->createStatement();
-        stmt->executeUpdate("delete from shop_cart where checkout=0 and "
-                            "user_id=" + to_string(userId) + " and product_id=" + to_string(productId));
+        pstmt = con->prepareStatement(
+                "delete from shop_cart where checkout=0 and user_id=? and product_id=?");
+        pstmt->setInt(1, userId);
+        pstmt->setInt(2, productId);
+        pstmt->execute();
+
     }
 
 
@@ -317,6 +335,48 @@ map<string, string> parse(const string &query) {
     return data;
 }
 
+bool checkUserLogged() {
+    DatabaseManager *dbMgr2 = new DatabaseManager();
+    string ssid = "";
+    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+        ssid = string(env_p);
+        map<string, string> parameters = parse(ssid);
+        if (!parameters.empty() && parameters["sid"] != "") {
+            string agent = string(getenv("HTTP_USER_AGENT"));
+            string ip = string(getenv("REMOTE_ADDR"));
+
+            User *u = dbMgr2->getUserWithCookie(parameters["sid"]);
+            if (u != nullptr) {
+                if (u->agent == agent && u->ip == ip) {
+                    string username = u->user_name;
+                    cout << "<h2> Welcome " << username << " </h2>\n";
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+string escapeHTML(string &Str) {
+    string escaped = "";
+    for (int i = 0; i < Str.size(); ++i) {
+        string ThisCh = Str.substr(i, 1);
+        if (ThisCh == "<")
+            ThisCh = "&lt;";
+        else if (ThisCh == ">")
+            ThisCh = "&gt;";
+        else if (ThisCh == "\"")
+            ThisCh = "&quot;";
+        else if (ThisCh == "'")
+            ThisCh = "&apos;";
+        else if (ThisCh == "&")
+            ThisCh = "&amp;";
+        escaped += ThisCh;
+    }
+    return escaped;
+}
+
 
 void printOrderSummary(vector<ShopCartProduct> products) {
     int total = 0;
@@ -346,7 +406,7 @@ void printOrderForm() {
 
 
 void printShopingCart(vector<ShopCartProduct> products) {
-    int total = 0;
+    long long total = 0;
     cout << "<center>\n";
     cout << "<h3>Your Shopping Cart</h3>\n";
     cout << "<form action=\"/cgi-bin/checkout\" method=\"POST\">\n";
@@ -409,6 +469,11 @@ string decode(string src) {
     return res;
 }
 
+bool isNumber(const std::string &s) {
+    return !s.empty() && std::find_if(s.begin(),
+                                      s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
 int main() {
     cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
@@ -418,48 +483,63 @@ int main() {
     map<string, string> parametersForm = parse(form_data);
     string action = decode(parametersForm["checkout"]);
 
+
     DatabaseManager *dbMgr = new DatabaseManager();
     string sid = "";
     int userId = -1;
     int productId = -1;
-    bool isUserLogged = false;
+    bool isUserLogged = checkUserLogged();
 
-    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        sid = string(env_p);
-        map<string, string> parameters = parse(sid);
-        if (!parameters.empty() && parameters["sid"] != "") {
-            User *u = dbMgr->getUserWithCookie(parameters["sid"]);
-            if (u != nullptr) {
-                userId = u->user_id;
-                string username = u->user_name;
-                cout << "<h2> Welcome " << username << " </h2>\n";
-                isUserLogged = true;
+    if (isUserLogged) {
 
-                vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                if (action == "Check Out") {
-                    printOrderSummary(shoppingCartProducts);
-                    printOrderForm();
-                } else if (action == "Update Quantities") {
-                    int index = 0;
-                    for (auto product : shoppingCartProducts) {
-                        int newQuantity = stoi(parametersForm["qty" + to_string(index)]);
-                        int productId = product.product_id;
-                        if (newQuantity > 0) {
-                            dbMgr->setQuantityCartProduct(userId, productId, newQuantity);
-                        } else {
-                            dbMgr->deleteProductFromCart(userId, productId);
-                        }
-                        index++;
-                    }
+        if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+            sid = string(env_p);
+            map<string, string> parameters = parse(sid);
+            if (!parameters.empty() && parameters["sid"] != "") {
+                User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+                if (u != nullptr) {
+                    userId = u->user_id;
+                    string username = u->user_name;
+
                     vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
-                    printShopingCart(shoppingCartProducts);
-                } else {
-                    cout << "<b>Not a valid action</b><br>";
-                    cout << "<a href='/cgi-bin/index'>Back</a>";
-                }
+                    if (action == "Check Out") {
+                        printOrderSummary(shoppingCartProducts);
+                        printOrderForm();
+                    } else if (action == "Update Quantities") {
+                        int index = 0;
+                        for (auto product : shoppingCartProducts) {
+                            string quantityStr = parametersForm["qty" + to_string(index)];
+                            quantityStr = escapeHTML(quantityStr);
 
+                            if (isNumber(quantityStr)) {
+                                long quanInt = stol(quantityStr);
+                                if (quanInt <= 200) {
+                                    int productId = product.product_id;
+                                    int newQuantity = stoi(quantityStr);
+                                    if (newQuantity > 0) {
+                                        dbMgr->setQuantityCartProduct(userId, productId, newQuantity);
+                                    } else {
+                                        dbMgr->deleteProductFromCart(userId, productId);
+                                    }
+                                } else {
+                                    cout << "Max quantity is 200<br>";
+                                }
+                            }
+                            index++;
+                        }
+                        vector<ShopCartProduct> shoppingCartProducts = dbMgr->getProductsOnShoppingCart(userId);
+                        printShopingCart(shoppingCartProducts);
+                    } else {
+                        cout << "<b>Not a valid action</b><br>";
+                        cout << "<a href='/cgi-bin/index'>Back</a>";
+                    }
+
+                }
             }
         }
+    } else {
+        cout << "Log back in<br>";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
     }
 
     return 0;

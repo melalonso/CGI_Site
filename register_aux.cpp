@@ -11,6 +11,11 @@
 #include <cppconn/prepared_statement.h>
 #include "bcrypt/BCrypt.hpp"
 
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
+
 using namespace std;
 
 
@@ -197,8 +202,9 @@ public:
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -278,6 +284,46 @@ string genRandomString(int size) {
     return randomString;
 }
 
+/* returns Str with all characters with special HTML meanings converted to
+  entity references. */
+string escapeHTML(string &Str) {
+    string escaped = "";
+    for (int i = 0; i < Str.size(); ++i) {
+        string ThisCh = Str.substr(i, 1);
+        if (ThisCh == "<")
+            ThisCh = "&lt;";
+        else if (ThisCh == ">")
+            ThisCh = "&gt;";
+        else if (ThisCh == "\"")
+            ThisCh = "&quot;";
+        else if (ThisCh == "'")
+            ThisCh = "&apos;";
+        else if (ThisCh == "&")
+            ThisCh = "&amp;";
+        escaped += ThisCh;
+    }
+    return escaped;
+}
+
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
 int main() {
     cout << "X-Frame-Options: DENY\n";
     cout << "Content-type:text/html\r\n\r\n";
@@ -290,6 +336,28 @@ int main() {
     string phone = decode(parameters["phone"]);
     string email = decode(parameters["email"]);
     string password = decode(parameters["password"]);
+
+    fullname = escapeHTML(fullname);
+    username = escapeHTML(username);
+    phone = escapeHTML(phone);
+    email = escapeHTML(email);
+
+
+    if (fullname.size() > 100) fullname = fullname.substr(0, 100);
+    if (email.size() > 30) email = email.substr(0, 30);
+    if (phone.size() > 15) phone = phone.substr(0, 15);
+
+    if (password.size() > 100 || username.size() > 20) {
+        cout << "Password must be max 100 chars long<br>";
+        cout << "Username must be max 20 chars long<br>";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
+        return 0;
+    } else if (trim(password) == "" || trim(username) == "" || trim(fullname) == "" || trim(phone) == "" ||
+               trim(email) == "") {
+        cout << "Data could not be empty nor be spaces<br>";
+        cout << "<a href='/cgi-bin/index'>Volver</a>";
+        return 0;
+    }
 
 
     DatabaseManager *dbMgr = new DatabaseManager();

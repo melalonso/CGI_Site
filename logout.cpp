@@ -21,16 +21,19 @@ public:
     string email;
     string phone;
     string password;
+    string cookie_id;
 
     User() {}
 
-    User(int user_id, string full_name, string user_name, string email, string phone, string password) {
+    User(int user_id, string full_name, string user_name, string email, string phone, string password,
+         string cookie_id) {
         this->user_id = user_id;
         this->full_name = full_name;
         this->user_name = user_name;
         this->email = email;
         this->phone = phone;
         this->password = password;
+        this->cookie_id = cookie_id;
     }
 };
 
@@ -87,20 +90,18 @@ public:
         delete pstmt;
     }
 
-    void insertUser(User u) {
-        pstmt = con->prepareStatement(
-                "INSERT INTO users(full_name, user_name, email, phone, password) VALUES (?,?,?,?,?)");
-        pstmt->setString(1, u.full_name);
-        pstmt->setString(2, u.user_name);
-        pstmt->setString(3, u.email);
-        pstmt->setString(4, u.phone);
-        pstmt->setString(5, u.password);
+
+    void updateUserCookie(string username, string cookieId) { // cookie of session
+        pstmt = con->prepareStatement("UPDATE users SET cookie_id = ? WHERE user_name = ?");
+        pstmt->setString(1, cookieId);
+        pstmt->setString(2, username);
         pstmt->execute();
     }
 
-    void updateUserCookie(string username, string cookieId) { // cookie of session
-        stmt = con->createStatement();
-        stmt->executeUpdate("UPDATE users SET cookie_id = \"" + cookieId + "\" WHERE user_name = '" + username + "'");
+    void cleanCookie(string username) { // cookie of session
+        pstmt = con->prepareStatement("UPDATE users SET cookie_id = '', agent='', ip='' WHERE user_name = ?");
+        pstmt->setString(1, username);
+        pstmt->execute();
     }
 
     void insertProduct(Product p) {
@@ -163,15 +164,16 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, email, phone, password, cookie_id);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
 
     User *getUserWithCookie(string cookie_id) {
         User *user = nullptr;
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT * from users where cookie_id=\"" + cookie_id + "\";");
+        pstmt = con->prepareStatement("SELECT * from users where cookie_id=?;");
+        pstmt->setString(1, cookie_id);
+        res = pstmt->executeQuery();
         if (res->next()) {
             int user_id = res->getInt(1);
             string full_name = res->getString(2);
@@ -180,7 +182,7 @@ public:
             string phone = res->getString(5);
             string password = res->getString(6);
             string cookie_id = res->getString(7);
-            user = new User(user_id, full_name, email, phone, password, cookie_id);
+            user = new User(user_id, full_name, user_name, email, phone, password, cookie_id);
         }
         return user;
     }
@@ -188,28 +190,61 @@ public:
 
 };
 
+map<string, string> parse(const string &query) {
+    string query2 = query.substr(0, query.size());
+    map<string, string> data;
+    regex pattern("([\\w+%]+)=([^&]*)");
+    auto words_begin = sregex_iterator(query2.begin(), query2.end(), pattern);
+    auto words_end = sregex_iterator();
+
+    for (sregex_iterator i = words_begin; i != words_end; i++) {
+        string key = (*i)[1].str();
+        string value = (*i)[2].str();
+        data[key] = value;
+    }
+    return data;
+}
+
+
+bool checkUserLogged() {
+    DatabaseManager *dbMgr2 = new DatabaseManager();
+    string ssid = "";
+    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
+        ssid = string(env_p);
+        map<string, string> parameters = parse(ssid);
+        if (!parameters.empty() && parameters["sid"] != "") {
+            User *u = dbMgr2->getUserWithCookie(parameters["sid"]);
+            if (u != nullptr) {
+                //string username = u->user_name;
+                //cout << "<h2> Welcome " << username << " </h2>\n";
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 int main() {
     DatabaseManager *dbMgr = new DatabaseManager();
-    bool isUserLogged = false;
+    bool isUserLogged = checkUserLogged();
     string ssid = "";
 
-    if (const char *env_p = std::getenv("HTTP_COOKIE")) {
-        ssid = string(env_p);
-        isUserLogged = true;
-    }
 
     cout << "X-Frame-Options: DENY\n";
 
     if (isUserLogged) {
-        //User *u = dbMgr->getUserWithCookie(ssid);
-        //if (u != nullptr) {
-        //dbMgr->updateUserCookie(u->user_name, "");
-        //delete u;
+        const char *env_p = std::getenv("HTTP_COOKIE");
+        string ssid = string(env_p);
+        map<string, string> parameters = parse(ssid);
+        User *u = dbMgr->getUserWithCookie(parameters["sid"]);
+        cout << u->user_name;
+        dbMgr->cleanCookie(u->user_name);
         cout << "Set-Cookie: sid=''; Expires=0; HttpOnly; Secure;\n";
         //cout << "Location: /cgi-bin/index\n";
+
         cout << "Content-type:text/html\r\n\r\n";
-        cout << "<script>window.location.href = 'https://172.24.131.14/cgi-bin/index'</script>\n";
+        cout << "<script>window.location.href = 'https://192.168.1.7/cgi-bin/index'</script>\n";
         //}
     } else {
         cout << "Content-type:text/html\r\n\r\n";
